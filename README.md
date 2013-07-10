@@ -28,3 +28,7 @@ AR.Droneのカメラ映像をリアルタイムにHMDに表示させる。
 - クリックタブルにする。今までの操作をより短縮し、使いやすくする。
 - 拡張。自分の感覚を拡張する。  
 - プロジェクター,HMD,ARdron,kinect.
+
+### 制作方針
+
+ProcessingdeでKinectもAR.Droneも制御する
