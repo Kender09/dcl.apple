@@ -57,12 +57,12 @@ void draw() {
   float[] velocity = ardrone.getVelocity();
   int battery = ardrone.getBatteryPercentage();
 
-//  String attitude = "pitch:" + pitch + "\nroll:" + roll + "\nyaw:" + yaw + "\naltitude:" + altitude;
-//  text(attitude, 20, 85);
-//  String vel = "vx:" + velocity[0] + "\nvy:" + velocity[1];
-//  text(vel, 20, 140);
-//  String bat = "battery:" + battery + " %";
-//  text(bat, 20, 170);
+  String attitude = "pitch:" + pitch + "\nroll:" + roll + "\nyaw:" + yaw + "\naltitude:" + altitude;
+  text(attitude, 20, 85);
+  String vel = "vx:" + velocity[0] + "\nvy:" + velocity[1];
+  text(vel, 20, 140);
+  String bat = "battery:" + battery + " %";
+  text(bat, 20, 170);
 //  
      kinect.update();  
   image(kinect.depthImage(), 0, 0);
