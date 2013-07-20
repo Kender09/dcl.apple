@@ -1,3 +1,5 @@
+public  int count;
+
 class poseOperation{
   SimpleOpenNI context;
   ARDroneForP5 ardrone;
@@ -21,10 +23,9 @@ class poseOperation{
   PVector leftHip = new PVector();
   
   float baseScale;
-  int count;
   int flag;
   
-  final int DelayTime = 50;
+  final int DelayTime = 20;
    
   poseOperation(SimpleOpenNI context, ARDroneForP5 ardrone){
     this.context = context;
@@ -56,7 +57,9 @@ class poseOperation{
       baseScale = head.y - torso.y;
       
 //      println(baseScale);
-      
+     print(flag);
+     println(count);
+     
      if(rightHand.y < torso.y && leftHand.y < torso.y && rightHand.z > torso.z + baseScale/2 && leftHand.z > torso.z + baseScale/2){     
        if(flag != 1){
          count=0;
@@ -165,8 +168,10 @@ class poseOperation{
         println("back");
       }else{
         flag = 0;
+        count = 0;
         stroke(255,0,0);
         ardrone.stop();
+        println("stop");
       }
   }
 }
