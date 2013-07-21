@@ -7,8 +7,10 @@ SimpleOpenNI  kinect;
 
 poseOperation pose;
 
-public float[] velocity;
 
+public float[] velocity;
+public float pitch;
+public float roll;
 /*
  *  added new method.
  *  void move3D(int speedX, int speedY, int speedZ, int speedSpin)
@@ -52,8 +54,8 @@ void draw() {
   //print all sensor information.
   //ardrone.printARDroneInfo();
   //get each sensor information.
-  float pitch = ardrone.getPitch();
-  float roll = ardrone.getRoll();
+  pitch = ardrone.getPitch();
+  roll = ardrone.getRoll();
   float yaw = ardrone.getYaw();
   float altitude = ardrone.getAltitude();
   velocity = ardrone.getVelocity();
@@ -75,12 +77,14 @@ if (userList.size() > 0) {
     int userId = userList.get(0);
     if ( kinect.isTrackingSkeleton(userId)) {
       pose.posePressed(userId);
+      attitudeControl(pitch,roll);
+      ardrone.stop();
       drawSkeleton(userId);
     }else{
        ardrone.landing(); 
     }
   }
-
+  
 }
 
 void drawSkeleton(int userId) {
@@ -163,8 +167,15 @@ void keyPressed() {
 }
 void keyReleased() {
   ardrone.stop();
+  attitudeControl(pitch,roll);
+  ardrone.stop();
 }
 
+
+void  attitudeControl(float xVelocity , float yVelocity){
+  ardrone.move3D(-(int)(xVelocity*10)/10,-(int)(yVelocity*10)/10,0,0);
+  println((int)(xVelocity*10));
+}
 
 // user-tracking callbacks!
 void onNewUser(int userId) {

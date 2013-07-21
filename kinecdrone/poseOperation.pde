@@ -1,7 +1,5 @@
 public  int count;
-public float pitch;
-public float roll;
-
+;
 class poseOperation{
   SimpleOpenNI context;
   ARDroneForP5 ardrone;
@@ -171,14 +169,8 @@ class poseOperation{
   count = 0;
   stroke(255,0,0);
   ardrone.stop();
-  text("stop", 700,100);
-  pitch = ardrone.getPitch();
-  roll = ardrone.getRoll();
-  attitudeControl(pitch,roll);
+  text("stop", 700,100);;
 }
 }
 
-void  attitudeControl(float xVelocity , float yVelocity){
-  ardrone.move3D(-(int)(xVelocity*10),-(int)(yVelocity*10),0,0);
-}
 }
