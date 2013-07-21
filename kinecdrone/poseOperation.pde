@@ -172,4 +172,8 @@ class poseOperation{
   text("stop", 700,100);
 }
 }
+
+void  attitudeControl(float xVelocity , float xVelocity){
+  
+}
 }

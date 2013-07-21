@@ -7,6 +7,8 @@ SimpleOpenNI  kinect;
 
 poseOperation pose;
 
+public float[] velocity;
+
 /**
  *  added new method.
  *  void move3D(int speedX, int speedY, int speedZ, int speedSpin)
@@ -54,17 +56,17 @@ void draw() {
   float roll = ardrone.getRoll();
   float yaw = ardrone.getYaw();
   float altitude = ardrone.getAltitude();
-  float[] velocity = ardrone.getVelocity();
+  velocity = ardrone.getVelocity();
   int battery = ardrone.getBatteryPercentage();
-
+  textSize(16);
   String attitude = "pitch:" + pitch + "\nroll:" + roll + "\nyaw:" + yaw + "\naltitude:" + altitude;
-  text(attitude, 20, 85);
+  text(attitude, 660, 85);
   String vel = "vx:" + velocity[0] + "\nvy:" + velocity[1];
-  text(vel, 20, 140);
+  text(vel, 660, 140);
   String bat = "battery:" + battery + " %";
-  text(bat, 20, 170);
-//  
-     kinect.update();  
+  text(bat, 660, 170);
+  textSize(50);  
+  kinect.update();  
   image(kinect.depthImage(), 0, 0);
 
   IntVector userList = new IntVector();
