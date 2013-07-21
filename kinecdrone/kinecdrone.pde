@@ -77,8 +77,6 @@ if (userList.size() > 0) {
     int userId = userList.get(0);
     if ( kinect.isTrackingSkeleton(userId)) {
       pose.posePressed(userId);
-      attitudeControl(pitch,roll);
-      ardrone.stop();
       drawSkeleton(userId);
     }else{
        ardrone.landing(); 
@@ -131,6 +129,7 @@ void keyPressed() {
   }
   else {
     if (key == 's') {
+      attitudeControl(pitch,roll);
       ardrone.stop();//stop
     }
     else if (key == 'r') {
@@ -166,8 +165,6 @@ void keyPressed() {
   }
 }
 void keyReleased() {
-  ardrone.stop();
-  attitudeControl(pitch,roll);
   ardrone.stop();
 }
 

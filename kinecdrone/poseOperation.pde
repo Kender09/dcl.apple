@@ -168,8 +168,10 @@ class poseOperation{
   flag = 0;
   count = 0;
   stroke(255,0,0);
+  attitudeControl(pitch,roll);
   ardrone.stop();
-  text("stop", 700,100);;
+  text("stop", 700,100);
+  ;
 }
 }
 
