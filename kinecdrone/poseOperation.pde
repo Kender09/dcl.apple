@@ -24,9 +24,9 @@ class poseOperation{
   
   float baseScale;
   int flag;
-  int move_speed = 5;
+  int move_speed = 10;
   
-  final int DelayTime = 20;
+  final int DelayTime = 10;
 
   poseOperation(SimpleOpenNI context, ARDroneForP5 ardrone){
     this.context = context;
@@ -110,7 +110,7 @@ class poseOperation{
     stroke(204,102,0);
     ardrone.move3D(-move_speed, 0, 0, 0);
   
-}else if(leftHand.z > neck.z + baseScale/4 && rightHand.z < neck.z - baseScale/4 && leftHand.y < head.y && leftHand.y > leftHip.y && rightHand.y < head.y && rightHand.y > rightHip.y){
+}else if(leftHand.z > neck.z + baseScale/4 && rightHand.z < neck.z - baseScale/4 && leftHand.y < head.y + baseScale/2&& leftHand.y > leftHip.y - baseScale/2 && rightHand.y < head.y + baseScale/2 && rightHand.y > rightHip.y - baseScale/2){
         //左
  text("left", 700,100);
   if(flag != 5){
