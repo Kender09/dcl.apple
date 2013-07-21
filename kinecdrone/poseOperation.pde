@@ -24,8 +24,7 @@ class poseOperation{
   
   float baseScale;
   int flag;
-  int move_speed = 10;
-
+  int move_speed = 5;
   
   final int DelayTime = 20;
 
@@ -34,7 +33,7 @@ class poseOperation{
     this.ardrone = ardrone;
     count = 0;
     flag = 0;
-    textSize(20);
+    textSize(50);
   }
   
   void posePressed(int userId){
@@ -60,7 +59,7 @@ class poseOperation{
     baseScale = head.y - torso.y;
 
 //      println(baseScale);
-    print(flag);
+    // print(flag);
     println(count);
 
     if(rightHand.y < torso.y && leftHand.y < torso.y && rightHand.z > torso.z + baseScale/2 && leftHand.z > torso.z + baseScale/2){     
@@ -69,8 +68,8 @@ class poseOperation{
        flag = 1;
      }
      count=0;
-     text("landing", 700, 100);
      ardrone.landing();
+     text("landing", 700, 100);
      stroke(255);
    }else if(rightHand.y < torso.y && leftHand.y < torso.y && rightHand.z < torso.z - baseScale/2 && leftHand.z < torso.z - baseScale/2){
     if(flag != 2){
@@ -81,8 +80,8 @@ class poseOperation{
     if(count!=DelayTime) return;
     else count=0;
 
-    text("takeoff", 700,100);
     ardrone.takeOff();
+    text("takeoff", 700,100);
     stroke(0,0,0);
   }else if(rightHand.y > head.y && leftHand.y > head.y){
         //範囲1,2
@@ -154,7 +153,7 @@ class poseOperation{
  ardrone.move3D(move_speed, 0, 0, 0);
  text("forward", 700,100);
 }else if(rightHand.y < torso.y && leftHand.y > head.y){
-        //後
+    //後
   if(flag != 8){
    count=0;
    flag = 8;
