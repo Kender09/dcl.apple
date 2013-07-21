@@ -1,6 +1,6 @@
 public  int count;
-public float pich;
-public float yaw;
+public float pitch;
+public float roll;
 
 class poseOperation{
   SimpleOpenNI context;
@@ -172,7 +172,9 @@ class poseOperation{
   stroke(255,0,0);
   ardrone.stop();
   text("stop", 700,100);
-  attitudeControl(pich,yaw);
+  pitch = ardrone.getPitch();
+  roll = ardrone.getRoll();
+  attitudeControl(pitch,roll);
 }
 }
 
