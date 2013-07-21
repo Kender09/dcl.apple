@@ -112,7 +112,7 @@ class poseOperation{
     stroke(204,102,0);
     ardrone.move3D(0, 0, move_speed, 0);
   }
-}else if(rightHand.x > head.x && rightHand.y > head.y && leftHand.x < head.x && leftHand.y < head.y && leftHand.y > torso.y){
+}else if(leftHand.z > neck.z + baseScale/2 && rightHand.z < neck.z - baseScale/2 && leftHand.y < head.y && leftHand.y > leftHip.y && rightHand.y < head.y && rightHand.y > rightHip.y){
         //左
  text("left", 700,100);
   if(flag != 5){
@@ -125,7 +125,7 @@ class poseOperation{
 
  stroke(255,255,0);
  ardrone.move3D(0, move_speed, 0, 0);
-}else if(rightHand.x > head.x && leftHand.y > head.y && leftHand.x < head.x && rightHand.y < head.y && rightHand.y > torso.y){
+}else if(rightHand.z > neck.z + baseScale/2 && leftHand.z < neck.z - baseScale/2 && leftHand.y < head.y && leftHand.y > leftHip.y && rightHand.y < head.y && rightHand.y > rightHip.y){
         //右
  text("right", 700,100);
   if(flag != 6){
