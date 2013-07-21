@@ -83,11 +83,9 @@ class poseOperation{
 
     ardrone.takeOff();
     stroke(0,0,0);
-  }else if(rightHand.y > head.y && leftHand.y > head.y){
-        //範囲1,2
-    if(rightHand.z < neck.z - baseScale/2 && leftHand.z < neck.z - baseScale/2){
-           //上
-    text("up", 700,100);
+  }else if(rightHand.y > head.y && leftHand.y > head.y &&  && rightHand.z > head.z - baseScale/2 && leftHand.z > head.z - baseScale/2 && rightHand.z < head.z + baseScale/2 && leftHand.z < head.z + baseScale/2){
+           //前
+      text("forward", 700,100);
      if(flag != 3){
       count=0;
       flag = 3;
@@ -97,10 +95,10 @@ class poseOperation{
     else count=0;
 
     stroke(153, 0, 255);
-    ardrone.move3D(0, 0, -move_speed, 0);
-  }else if(neck.z + baseScale/2 < rightHand.z  && neck.z + baseScale/2 < leftHand.z){
-            //下
-    text("down", 700,100);
+    ardrone.move3D(move_speed, 0, 0, 0);
+  }else if(rightHand.y < torso.y && leftHand.y < torso.y && rightHand.z > torso.z - baseScale/2 && leftHand.z > torso.z - baseScale/2 && rightHand.z < torso.z + baseScale/2 && leftHand.z < torso.z + baseScale/2){
+            //後ろ
+    text("back", 700,100);
     if(flag != 4){
       count=0;
       flag = 4;
@@ -110,8 +108,8 @@ class poseOperation{
     else count=0;
 
     stroke(204,102,0);
-    ardrone.move3D(0, 0, move_speed, 0);
-  }
+    ardrone.move3D(-move_speed, 0, 0, 0);
+  
 }else if(leftHand.z > neck.z + baseScale/2 && rightHand.z < neck.z - baseScale/2 && leftHand.y < head.y && leftHand.y > leftHip.y && rightHand.y < head.y && rightHand.y > rightHip.y){
         //左
  text("left", 700,100);
@@ -139,8 +137,8 @@ class poseOperation{
  stroke(0,255,0);
  ardrone.move3D(0, -move_speed, 0, 0);
 }else if(rightHand.y > head.y && leftHand.y < torso.y){
-        //前
- text("forward", 700,100);
+        //上
+  text("up", 700,100);
   if(flag != 7){
    count=0;
    flag = 7;
@@ -150,10 +148,10 @@ class poseOperation{
  else count=0;
 
  stroke(0,0,255);
- ardrone.move3D(move_speed, 0, 0, 0);
+ ardrone.move3D(0, 0, -move_speed, 0);
 }else if(rightHand.y < torso.y && leftHand.y > head.y){
-    //後
- text("back", 700,100);
+    //下
+  text("down", 700,100);
   if(flag != 8){
    count=0;
    flag = 8;
@@ -163,7 +161,7 @@ class poseOperation{
  else count=0;
 
  stroke(255,102,255);
- ardrone.move3D(-move_speed, 0, 0, 0);
+ ardrone.move3D(0, 0, move_speed, 0); 
 }else{
   flag = 0;
   count = 0;
