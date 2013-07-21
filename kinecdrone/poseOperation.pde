@@ -1,4 +1,6 @@
 public  int count;
+public float pich;
+public float yaw;
 
 class poseOperation{
   SimpleOpenNI context;
@@ -170,10 +172,11 @@ class poseOperation{
   stroke(255,0,0);
   ardrone.stop();
   text("stop", 700,100);
+  attitudeControl(pich,yaw);
 }
 }
 
-void  attitudeControl(float xVelocity , float xVelocity){
-  
+void  attitudeControl(float xVelocity , float yVelocity){
+  ardrone.move3D(-(int)(xVelocity*10),-(int)(yVelocity*10),0,0);
 }
 }

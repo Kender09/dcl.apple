@@ -9,7 +9,7 @@ poseOperation pose;
 
 public float[] velocity;
 
-/**
+/*
  *  added new method.
  *  void move3D(int speedX, int speedY, int speedZ, int speedSpin)
  *  @param speedX : the speed of x-axis, [-100,100]
@@ -17,6 +17,7 @@ public float[] velocity;
  *  @param speedZ : the speed of z-axis, [-100,100]
  *  @param speedSpin : the speed of rotation, [-100,100]
  */
+
 void setup() {
   size(640*2, 480);
 
@@ -29,7 +30,6 @@ void setup() {
   ardrone.connectVideo();
   //start the connections.
   ardrone.start();
-  
   kinect = new SimpleOpenNI(this);
   kinect.enableDepth();
   kinect.enableUser(SimpleOpenNI.SKEL_PROFILE_ALL);
@@ -60,11 +60,11 @@ void draw() {
   int battery = ardrone.getBatteryPercentage();
   textSize(16);
   String attitude = "pitch:" + pitch + "\nroll:" + roll + "\nyaw:" + yaw + "\naltitude:" + altitude;
-  text(attitude, 660, 85);
+  text(attitude, 660, 300);
   String vel = "vx:" + velocity[0] + "\nvy:" + velocity[1];
-  text(vel, 660, 140);
+  text(vel, 660, 440);
   String bat = "battery:" + battery + " %";
-  text(bat, 660, 170);
+  text(bat, 1060, 470);
   textSize(50);  
   kinect.update();  
   image(kinect.depthImage(), 0, 0);
