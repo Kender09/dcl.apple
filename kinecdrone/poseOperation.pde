@@ -86,7 +86,7 @@ class poseOperation{
 
     ardrone.takeOff();
     stroke(0,0,0);
-  }else if(rightHand.y > head.y && leftHand.y > head.y &&  && rightHand.z > head.z - baseScale && leftHand.z > head.z - baseScale && rightHand.z < head.z + baseScale && leftHand.z < head.z + baseScale){
+  }else if(rightHand.y > head.y && leftHand.y > head.y &&  rightHand.z > head.z - baseScale && leftHand.z > head.z - baseScale && rightHand.z < head.z + baseScale && leftHand.z < head.z + baseScale){
            //前
       text("forward", 700,100);
      if(flag != 3){
