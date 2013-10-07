@@ -78,12 +78,15 @@ class poseOperation{
       flag = 2;
     }
     count++;
-    if(count!=DelayTime) return;
+     if(count!=DelayTime){
+  ardrone.stop();
+  return;
+}
     else count=0;
 
     ardrone.takeOff();
     stroke(0,0,0);
-  }else if(rightHand.y > head.y && leftHand.y > head.y &&  && rightHand.z > head.z - baseScale && leftHand.z > head.z - baseScale && rightHand.z < head.z + baseScale && leftHand.z < head.z + baseScale){
+  }else if(rightHand.y > head.y && leftHand.y > head.y &&  rightHand.z > head.z - baseScale && leftHand.z > head.z - baseScale && rightHand.z < head.z + baseScale && leftHand.z < head.z + baseScale){
            //前
       text("forward", 700,100);
      if(flag != 3){
@@ -91,7 +94,10 @@ class poseOperation{
       flag = 3;
     }
     count++;
-    if(count!=DelayTime) return;
+     if(count!=DelayTime){
+  ardrone.stop();
+  return;
+}
     else count=0;
 
     stroke(153, 0, 255);
@@ -104,7 +110,10 @@ class poseOperation{
       flag = 4;
     }
     count++;
-    if(count!=DelayTime) return;
+     if(count!=DelayTime){
+  ardrone.stop();
+  return;
+}
     else count=0;
 
     stroke(204,102,0);
@@ -118,7 +127,10 @@ class poseOperation{
    flag = 5;
  }
  count++;
- if(count!=DelayTime) return;
+  if(count!=DelayTime){
+  ardrone.stop();
+  return;
+}
  else count=0;
 
  stroke(255,255,0);
@@ -131,7 +143,10 @@ class poseOperation{
    flag = 6;
  }
  count++;
- if(count!=DelayTime) return;
+  if(count!=DelayTime){
+  ardrone.stop();
+  return;
+}
  else count=0;
 
  stroke(0,255,0);
@@ -144,7 +159,10 @@ class poseOperation{
    flag = 7;
  }
  count++;
- if(count!=DelayTime) return;
+ if(count!=DelayTime){
+  ardrone.stop();
+  return;
+}
  else count=0;
 
  stroke(0,0,255);
@@ -157,7 +175,10 @@ class poseOperation{
    flag = 8;
  }
  count++;
- if(count!=DelayTime) return;
+  if(count!=DelayTime){
+  ardrone.stop();
+  return;
+}
  else count=0;
 
  stroke(255,102,255);
