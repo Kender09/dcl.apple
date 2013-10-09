@@ -199,9 +199,10 @@ void onStartPose(String pose, int userId) {
 }
 
 void exit() {
-  //ここに終了処理
+  //ここに終了処理b
   ardrone.stop();
   ardrone.landing();
+  println("exit");
   super.exit();
 }
 

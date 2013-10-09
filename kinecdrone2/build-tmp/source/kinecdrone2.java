@@ -258,9 +258,10 @@ public void onStartPose(String pose, int userId) {
 }
 
 public void exit() {
-  //\u3053\u3053\u306b\u7d42\u4e86\u51e6\u7406
+  //\u3053\u3053\u306b\u7d42\u4e86\u51e6\u7406b
   ardrone.stop();
   ardrone.landing();
+  println("exit");
   super.exit();
 }
 
@@ -337,8 +338,8 @@ class poseOperation{
     playerRoll = playerRoll/move_speed;
     playerYaw = playerYaw/move_speed;
 
-    println("playerRoll: " + playerRoll);
-    println("playerYaw: " + playerYaw);
+    // println("playerRoll: " + playerRoll);
+    // println("playerYaw: " + playerYaw);
 
     if(abs(playerRoll) < 5){
       playerRoll = 0;

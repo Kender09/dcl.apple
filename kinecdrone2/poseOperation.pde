@@ -71,8 +71,8 @@ class poseOperation{
     playerRoll = playerRoll/move_speed;
     playerYaw = playerYaw/move_speed;
 
-    println("playerRoll: " + playerRoll);
-    println("playerYaw: " + playerYaw);
+    // println("playerRoll: " + playerRoll);
+    // println("playerYaw: " + playerYaw);
 
     if(abs(playerRoll) < 5){
       playerRoll = 0;
