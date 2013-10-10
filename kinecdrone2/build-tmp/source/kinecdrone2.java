@@ -329,8 +329,17 @@ class poseOperation{
     baseScale = head.y - torso.y;
     
     playerRoll = leftHand.z - rightHand.z;
+
+    playerYaw = (rightHand.y + leftHand.y)/2.0f;
     
-    playerYaw = (rightHand.y + leftHand.y)/2.0f - head.y;
+    if(playerYaw > head.y){
+      playerYaw = playerYaw - head.y;
+    }else if(playerYaw < torso.y){
+      playerYaw = playerYaw - torso.y;
+    }else{
+      playerYaw = 0;
+    }
+    
 
     // println("playerRoll: " + playerRoll);
     // println("playerYaw: " + playerYaw);
@@ -377,7 +386,7 @@ class poseOperation{
       stroke(0,255,255);
       ardrone.move3D((int)playerYaw,(int)playerRoll, 0, 0);
     }else{
-      stroke(255,0,0);
+      stroke(0,0,0);
       ardrone.stop();
     } 
   }
