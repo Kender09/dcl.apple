@@ -30,5 +30,10 @@ AR.Droneのカメラ映像をリアルタイムにHMDに表示させる。
 - プロジェクター,HMD,ARdron,kinect.
 
 ### 制作方針
-
 ProcessingdeでKinectもAR.Droneも制御する
+
+### 10/12改善点
+- HMDを用いて首の回転とAR.Droneの回転の同期
+- 扇風機などをもちいてAR.Droneの感覚の共有
+- 羽ばたきによる上昇の実装
+- センサーの追加をするか考察

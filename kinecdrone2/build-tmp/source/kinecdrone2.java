@@ -222,12 +222,15 @@ public void keyPressed() {
     else if (key == 'n') {
       ardrone.move3D(10, 0, 0, 20);//turn left
     }
+    else if (key == 'e') {
+      noLoop(); 
+      exit(); //end proglam
+    }
   }
 }
 public void keyReleased() {
   ardrone.stop();
 }
-
 
 public void  attitudeControl(float xVelocity , float yVelocity){
   ardrone.move3D(-(int)(xVelocity*10)/10,-(int)(yVelocity*10)/10,0,0);
@@ -258,7 +261,7 @@ public void onStartPose(String pose, int userId) {
 }
 
 public void exit() {
-  //\u3053\u3053\u306b\u7d42\u4e86\u51e6\u7406b
+  //\u3053\u3053\u306b\u7d42\u4e86\u51e6\u7406
   ardrone.stop();
   ardrone.landing();
   println("exit");
@@ -345,7 +348,7 @@ class poseOperation{
     // println("playerYaw: " + playerYaw);
 
     playerRoll = playerRoll/move_speed;
-    playerYaw = playerYaw/move_speed;
+    playerYaw = playerYaw/(move_speed-10);
 
     // println("playerRoll: " + playerRoll);
     // println("playerYaw: " + playerYaw);
@@ -386,7 +389,7 @@ class poseOperation{
       stroke(0,255,255);
       ardrone.move3D((int)playerYaw,(int)playerRoll, 0, 0);
     }else{
-      stroke(0,0,0);
+      stroke(255,255,255);
       ardrone.stop();
     } 
   }

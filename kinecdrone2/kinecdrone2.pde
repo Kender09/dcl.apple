@@ -163,12 +163,15 @@ void keyPressed() {
     else if (key == 'n') {
       ardrone.move3D(10, 0, 0, 20);//turn left
     }
+    else if (key == 'e') {
+      noLoop(); 
+      exit(); //end proglam
+    }
   }
 }
 void keyReleased() {
   ardrone.stop();
 }
-
 
 void  attitudeControl(float xVelocity , float yVelocity){
   ardrone.move3D(-(int)(xVelocity*10)/10,-(int)(yVelocity*10)/10,0,0);
@@ -199,7 +202,7 @@ void onStartPose(String pose, int userId) {
 }
 
 void exit() {
-  //ここに終了処理b
+  //ここに終了処理
   ardrone.stop();
   ardrone.landing();
   println("exit");

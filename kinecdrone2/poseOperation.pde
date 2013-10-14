@@ -78,7 +78,7 @@ class poseOperation{
     // println("playerYaw: " + playerYaw);
 
     playerRoll = playerRoll/move_speed;
-    playerYaw = playerYaw/move_speed;
+    playerYaw = playerYaw/(move_speed-10);
 
     // println("playerRoll: " + playerRoll);
     // println("playerYaw: " + playerYaw);
@@ -109,6 +109,7 @@ class poseOperation{
         }
       }else if(playerYaw<0){
         text("back", 700,100);
+          playerYaw  = playerYaw - 5;
         if(playerYaw<-30){
           playerYaw = -30;
         }
@@ -119,7 +120,7 @@ class poseOperation{
       stroke(0,255,255);
       ardrone.move3D((int)playerYaw,(int)playerRoll, 0, 0);
     }else{
-      stroke(0,0,0);
+      stroke(255,255,255);
       ardrone.stop();
     } 
   }
