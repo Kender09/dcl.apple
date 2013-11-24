@@ -37,6 +37,7 @@ void setup() {
   kinect.enableUser(SimpleOpenNI.SKEL_PROFILE_ALL);
   
   pose = new poseOperation(kinect,ardrone);
+  // テキストの太さ
   strokeWeight(5);
 }
 
@@ -73,7 +74,7 @@ void draw() {
 
   IntVector userList = new IntVector();
   kinect.getUsers(userList);
-if (userList.size() > 0) {
+  if (userList.size() > 0) {
     int userId = userList.get(0);
     if ( kinect.isTrackingSkeleton(userId)) {
       pose.posePressed(userId);
@@ -82,7 +83,6 @@ if (userList.size() > 0) {
        ardrone.landing(); 
     }
   }
-  
 }
 
 void drawSkeleton(int userId) {
@@ -107,19 +107,11 @@ void drawSkeleton(int userId) {
 //control the AR.Drone via keyboard input.
 void keyPressed() {
   if (key == CODED) {
-    if (keyCode == UP) {
-      ardrone.move3D(10, 0, 0, 0);//forward
-    }
-    else if (keyCode == DOWN) {
-      ardrone.move3D(-10, 0, 0, 0);//backward
-    }
-    else if (keyCode == LEFT) {
-      ardrone.move3D(0, 10, 0, 0);//go left
-    }
-    else if (keyCode == RIGHT) {
-      ardrone.move3D(0, -10, 0, 0);//go right
-    }
-    else if (keyCode == SHIFT) {
+    if (keyCode == UP)         ardrone.move3D(10, 0, 0, 0);//forward
+    else if (keyCode == DOWN)  ardrone.move3D(-10, 0, 0, 0);//backward
+    else if (keyCode == LEFT)  ardrone.move3D(0, 10, 0, 0);//go left
+    else if (keyCode == RIGHT) ardrone.move3D(0, -10, 0, 0);//go right
+    else if (keyCode == SHIFT){
       ardrone.takeOff();//take off
       println("push");
       text("takeOff", 700,100);
@@ -130,39 +122,17 @@ void keyPressed() {
     }
   }
   else {
-    if (key == 's') {
-      ardrone.stop();//stop
-    }
-    else if (key == 'r') {
-      ardrone.move3D(0, 0, 0, -20); //spin right(cw)
-    }
-    else if (key == 'l') {
-      ardrone.move3D(0, 0, 0, 20);//spin left(ccw)
-    }
-    else if (key == 'u') {
-      ardrone.move3D(0, 0, -10, 0);//up
-    }
-    else if (key == 'd') {
-      ardrone.move3D(0, 0, 10, 0);//down
-    }
-    else if (key == 'z') {
-      ardrone.move3D(10, 10, 0, 0);//diagonally forward left
-    }
-    else if (key == 'x') {
-      ardrone.move3D(-10, -10, 0, 0);//diagonally backward right
-    }
-    else if (key == 'c') {
-      ardrone.move3D(10, 10, -10, 0);//diagonally forward left up
-    }
-    else if (key == 'v') {
-      ardrone.move3D(-10, -10, 10, 0);//diagonally backward right down
-    }
-    else if (key == 'b') {
-      ardrone.move3D(10, 0, 0, -20);//turn right
-    }
-    else if (key == 'n') {
-      ardrone.move3D(10, 0, 0, 20);//turn left
-    }
+    if (key == 's') ardrone.stop();//stop
+    else if (key == 'r') ardrone.move3D(0, 0, 0, -20); //spin right(cw)
+    else if (key == 'l') ardrone.move3D(0, 0, 0, 20);//spin left(ccw)
+    else if (key == 'u') ardrone.move3D(0, 0, -10, 0);//up
+    else if (key == 'd') ardrone.move3D(0, 0, 10, 0);//down
+    else if (key == 'z') ardrone.move3D(10, 10, 0, 0);//diagonally forward left
+    else if (key == 'x') ardrone.move3D(-10, -10, 0, 0);//diagonally backward right
+    else if (key == 'c') ardrone.move3D(10, 10, -10, 0);//diagonally forward left up
+    else if (key == 'v') ardrone.move3D(-10, -10, 10, 0);//diagonally backward right down
+    else if (key == 'b') ardrone.move3D(10, 0, 0, -20);//turn right
+    else if (key == 'n') ardrone.move3D(10, 0, 0, 20);//turn left
     else if (key == 'e') {
       noLoop(); 
       exit(); //end proglam
