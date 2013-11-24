@@ -42,8 +42,7 @@ void setup() {
   kinect.enableDepth();
   kinect.enableUser(SimpleOpenNI.SKEL_PROFILE_ALL);
   
-  pose = new PoseOperation(kinect,ardrone);
-  send =  new send_ARdrone_comand();
+  pose = new PoseOperation(kinect);
 
   con = new ArDroneOrder();
   con.yaw = 0;
@@ -84,6 +83,7 @@ void draw() {
   image(receiveImage,640,0, 640, 480);
 
 
+  //kinect プログラム
   textSize(50);  
   kinect.update();  
   image(kinect.depthImage(), 0, 0);
@@ -92,13 +92,15 @@ void draw() {
   kinect.getUsers(userList);
   if (userList.size() > 0) {
     int userId = userList.get(0);
-    if(kinect.isTrackingSkeleton(userId)) {
-      send = pose.posePressed(userId);
-      msg = send.yaw + ":" + send.roll;
+    if( kinect.isTrackingSkeleton(userId) ){
+      con = pose.posePressed(userId);
+      msg = con.yaw + ":" + con.roll;
       chatServer.write(msg);
       msg="";
       drawSkeleton(userId);
     }else{
+      con.yaw = 0;
+      con.roll = 0;
     }
   }
 

@@ -35,9 +35,8 @@ class PoseOperation{
   float playerRoll;
   float playerYaw;
 
-  PoseOperation(SimpleOpenNI context, ARDroneForP5 ardrone){
+  PoseOperation(SimpleOpenNI context){
     this.context = context;
-    this.ardrone = ardrone;
     count = 0;
     flag = 0;
     textSize(50);

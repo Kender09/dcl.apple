@@ -81,9 +81,9 @@ public class client extends PApplet {
 
 SimpleOpenNI  kinect;
 
-poseOperation pose;
+PoseOperation pose;
 
-send_ARdrone_command send;
+ArDroneOrder con;
 
 DatagramPacket sendPacket;
 DatagramPacket receivePacket;
@@ -109,8 +109,11 @@ public void setup() {
   kinect.enableDepth();
   kinect.enableUser(SimpleOpenNI.SKEL_PROFILE_ALL);
   
-  pose = new poseOperation(kinect,ardrone);
-  send =  new send_ARdrone_comand();
+  pose = new PoseOperation(kinect);
+
+  con = new ArDroneOrder();
+  con.yaw = 0;
+  con.roll = 0;
   // \u30c6\u30ad\u30b9\u30c8\u306e\u592a\u3055
   strokeWeight(5);
 
@@ -147,6 +150,7 @@ public void draw() {
   image(receiveImage,640,0, 640, 480);
 
 
+  //kinect \u30d7\u30ed\u30b0\u30e9\u30e0
   textSize(50);  
   kinect.update();  
   image(kinect.depthImage(), 0, 0);
@@ -155,13 +159,15 @@ public void draw() {
   kinect.getUsers(userList);
   if (userList.size() > 0) {
     int userId = userList.get(0);
-    if(kinect.isTrackingSkeleton(userId)) {
-      send = pose.posePressed(userId);
-      msg = send.yaw + ":" + send.roll;
+    if( kinect.isTrackingSkeleton(userId) ){
+      con = pose.posePressed(userId);
+      msg = con.yaw + ":" + con.roll;
       chatServer.write(msg);
       msg="";
       drawSkeleton(userId);
     }else{
+      con.yaw = 0;
+      con.roll = 0;
     }
   }
 
@@ -220,12 +226,12 @@ public void keyPressed() {
 }
 public  int count;
 
-class send_ARdrone_comand{
+class ArDroneOrder{
   int yaw;
   int roll;
 }
 
-class poseOperation{
+class PoseOperation{
   SimpleOpenNI context;
   
   PVector rightHand = new PVector();
@@ -251,21 +257,18 @@ class poseOperation{
   int move_speed = 50;
   
   final int DelayTime = 10;
-
-  send_ARdrone_comand send_comand = new send_ARdrone_comand();
   
   float playerRoll;
   float playerYaw;
 
-  poseOperation(SimpleOpenNI context, ARDroneForP5 ardrone){
+  PoseOperation(SimpleOpenNI context){
     this.context = context;
-    this.ardrone = ardrone;
     count = 0;
     flag = 0;
     textSize(50);
   }
-  
-  public send_ARdrone_comand posePressed(int userId){
+
+  public ArDroneOrder posePressed(int userId){
 
     context.getJointPositionSkeleton(userId, SimpleOpenNI.SKEL_RIGHT_HAND, rightHand);
     context.getJointPositionSkeleton(userId, SimpleOpenNI.SKEL_RIGHT_ELBOW, rightElbow);
@@ -299,6 +302,7 @@ class poseOperation{
       playerYaw = 0;
     }
     
+    ArDroneOrder poseCon = new ArDroneOrder();
 
     // println("playerRoll: " + playerRoll);
     // println("playerYaw: " + playerYaw);
@@ -344,13 +348,14 @@ class poseOperation{
 
     if(playerYaw != 0 || playerRoll != 0){
       stroke(0,255,255);
-      send_comand.yaw = (int)playerYaw;
-      send_comand.roll =  (int)playerRoll;
+      poseCon.yaw = (int)playerYaw;
+      poseCon.roll = (int)playerRoll;
     }else{
       stroke(255,255,255);
-      send_comand.yaw = 0;
-      send_comand.roll =  0;
+      poseCon.yaw = 0;
+      poseCon.roll = 0;
     } 
+    return poseCon;
   }
 }
   static public void main(String[] passedArgs) {
