@@ -69,6 +69,7 @@ void draw() {
   text(vel, 660, 440);
   String bat = "battery:" + battery + " %";
   text(bat, 1060, 470);
+  
   textSize(50);  
   kinect.update();  
   image(kinect.depthImage(), 0, 0);

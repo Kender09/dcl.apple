@@ -10,17 +10,14 @@ import java.net.*;
 
 import java.*;
 
-// InetSocketAddress remoteAddress;
 DatagramPacket sendPacket;
 DatagramPacket receivePacket;
 DatagramSocket receiveSocket;
 
-// Server server;
-
 Server chatServer;
 Client cl;
 
-String msg,smsg;
+String msg;
 
 byte[] sendBytes;
 //受信するバイト配列を格納する箱
@@ -29,8 +26,6 @@ byte[] receivedBytes = new byte[300000];
 
 void setup() {
   size(640, 480);
-  
-    // remoteAddress = new InetSocketAddress("localhost",5000);
 
     chatServer = new Server(this,2001);
 
@@ -52,15 +47,14 @@ void setup() {
 void draw() {
   background(204);
   
-  String msg;
   cl =chatServer.available();
   if(cl !=null) println("connected");
   //クライアントがnullでないならループへ
-  if((cl != null)&&(cl.available()>0)) {
-    msg=cl.readStringUntil('\n');
-    println(msg);
-    // chatServer.write(msg);//全員に送信
-  }
+  // if((cl != null)&&(cl.available()>0)) {
+  //   msg=cl.readStringUntil('\n');
+  //   println(msg);
+  //   // chatServer.write(msg);//全員に送信
+  // }
 
   try {
     receiveSocket.receive(receivePacket);

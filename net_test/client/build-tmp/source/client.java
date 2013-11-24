@@ -77,9 +77,6 @@ public class client extends PApplet {
 
 ARDroneForP5 ardrone;
 
-// Client client;
-// Server server;
-
 InetSocketAddress remoteAddress;
 DatagramPacket sendPacket;
 DatagramPacket receivePacket;
@@ -90,28 +87,18 @@ byte[] sendBytes;
 
 byte[] receivedBytes = new byte[300000];
 
+Client chatClient;
+float Val;
+String smsg;
+
 public void setup() {
   size(640, 480);
-  // client = new Client(this, "127.0.0.1",20000);
 
-  remoteAddress = new InetSocketAddress("localhost",5100);
-  // try{
-  //   receiveSocket.setSoTimeout(1000);
-  // }catch(SocketException e){
-  // }
+  remoteAddress = new InetSocketAddress("192.168.10.42",5100);
 
-  try {
-    //\u53d7\u4fe1\u30dd\u30fc\u30c8
-    receiveSocket = new DatagramSocket(5000);
-  }
-  catch(SocketException e) {
-  }
-  //\u53d7\u4fe1\u7528\u30d1\u30b1\u30c3\u30c8
-  receivePacket = new DatagramPacket(receivedBytes,receivedBytes.length);
-  try{
-    receiveSocket.setSoTimeout(1000);
-  }catch(SocketException e){
-  }
+
+  chatClient = new Client(this, "192.168.10.42", 2001);
+
 
   ardrone = new ARDroneForP5("192.168.1.1");
   ardrone.connect();  
@@ -134,7 +121,10 @@ public void draw() {
   // image(img, 0, 0,640,480);
   }
   // capture.read();
-
+  if(chatClient.available()>0){
+    smsg=chatClient.readStringUntil('\n');
+    println(smsg);
+  }
 
    //\u30d0\u30c3\u30d5\u30a1\u30fc\u30a4\u30e1\u30fc\u30b8\u306b\u5909\u63db
   BufferedImage bfImage = PImage2BImage(img);
@@ -175,12 +165,6 @@ public BufferedImage PImage2BImage(PImage pImg) {
 }  
 
 public void keyPressed() {
-  String s;
-    if (key == 's') {
-      s = "s";
-      text("PUSH[S]",100,100);
-      // client.write(s);
-    }
 }
 
 

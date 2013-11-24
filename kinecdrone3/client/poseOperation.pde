@@ -5,10 +5,9 @@ class ArDroneOrder{
   int roll;
 }
 
-
-class poseOperation{
+class PoseOperation{
   SimpleOpenNI context;
-
+  
   PVector rightHand = new PVector();
   PVector rightElbow = new PVector();
   PVector rightShoulder = new PVector();
@@ -36,13 +35,14 @@ class poseOperation{
   float playerRoll;
   float playerYaw;
 
-  poseOperation(SimpleOpenNI context){
+  PoseOperation(SimpleOpenNI context, ARDroneForP5 ardrone){
     this.context = context;
+    this.ardrone = ardrone;
     count = 0;
     flag = 0;
     textSize(50);
   }
-  
+
   ArDroneOrder posePressed(int userId){
 
     context.getJointPositionSkeleton(userId, SimpleOpenNI.SKEL_RIGHT_HAND, rightHand);
@@ -79,19 +79,25 @@ class poseOperation{
     
     ArDroneOrder poseCon = new ArDroneOrder();
 
+    // println("playerRoll: " + playerRoll);
+    // println("playerYaw: " + playerYaw);
+
     playerRoll = playerRoll/move_speed;
     playerYaw = playerYaw/(move_speed-10);
+
+    // println("playerRoll: " + playerRoll);
+    // println("playerYaw: " + playerYaw);
 
     if(abs(playerRoll) < 5){
       playerRoll = 0;
     }else{
       if(playerRoll>0){
-        text("left", 100,200);
+        text("left", 700,200);
         if(playerRoll > 30){
           playerRoll = 30;
         }
       }else if(playerRoll<0){
-        text("right", 100,200);
+        text("right", 700,200);
         if(playerRoll < -30){
           playerRoll = -30;
         }
@@ -102,12 +108,12 @@ class poseOperation{
       playerYaw = 0;
     }else{
       if(playerYaw>0){
-        text("forward", 100,100);
+        text("forward", 700,100);
         if(playerYaw>30){
           playerYaw = 30;
         }
       }else if(playerYaw<0){
-        text("back", 100,100);
+        text("back", 700,100);
           playerYaw  = playerYaw;
         if(playerYaw<-30){
           playerYaw = -30;
@@ -123,7 +129,6 @@ class poseOperation{
       stroke(255,255,255);
       poseCon.yaw = 0;
       poseCon.roll = 0;
-      // ardrone.stop();
     } 
     return poseCon;
   }

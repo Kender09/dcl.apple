@@ -11,9 +11,6 @@ import java.net.*;
 
 ARDroneForP5 ardrone;
 
-// Client client;
-// Server server;
-
 InetSocketAddress remoteAddress;
 DatagramPacket sendPacket;
 DatagramPacket receivePacket;
@@ -26,24 +23,16 @@ byte[] receivedBytes = new byte[300000];
 
 Client chatClient;
 float Val;
-String msg,smsg;
-String id;
+String smsg;
 
 void setup() {
   size(640, 480);
-  // client = new Client(this, "127.0.0.1",20000);
 
-  remoteAddress = new InetSocketAddress("localhost",5100);
+  remoteAddress = new InetSocketAddress("192.168.10.42",5100);
 
 
-  // try{
-  //   receiveSocket.setSoTimeout(1000);
-  // }catch(SocketException e){
-  // }
-  chatClient = new Client(this, "127.0.0.1", 2001);
+  chatClient = new Client(this, "192.168.10.42", 2001);
 
-  msg="";
-  id="taro>";
 
   ardrone = new ARDroneForP5("192.168.1.1");
   ardrone.connect();  
@@ -110,12 +99,6 @@ BufferedImage PImage2BImage(PImage pImg) {
 }  
 
 void keyPressed() {
-  int dmy;
-  msg = msg + key;
-  if(key =='\n') {
-    chatClient.write(id+msg);//サーバーに数字を送る
-    msg="";
-  }
 }
 
 

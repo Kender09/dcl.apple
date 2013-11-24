@@ -3,16 +3,8 @@ import processing.data.*;
 import processing.event.*; 
 import processing.opengl.*; 
 
-import processing.net.*; 
 import SimpleOpenNI.*; 
-import processing.video.*; 
-import java.awt.image.*; 
-import java.awt.*; 
-import javax.imageio.*; 
-import java.net.DatagramPacket; 
-import java.net.DatagramSocket; 
-import java.net.*; 
-import java.*; 
+import processing.net.*; 
 
 import org.slf4j.helpers.*; 
 import com.xuggle.xuggler.video.*; 
@@ -68,103 +60,67 @@ public class client extends PApplet {
 
 
 
-
-
-
-
-
-  
-
-
-
-
-
 SimpleOpenNI  kinect;
 
 poseOperation pose;
+ArDroneOrder con;
 
-send_ARdrone_command send;
+Client client;
 
-DatagramPacket sendPacket;
-DatagramPacket receivePacket;
-DatagramSocket receiveSocket;
+public float[] velocity;
+public float pitch;
+public float roll;
 
-Server chatServer;
-Client cl;
-
-String msg;
-
-byte[] sendBytes;
-//\u53d7\u4fe1\u3059\u308b\u30d0\u30a4\u30c8\u914d\u5217\u3092\u683c\u7d0d\u3059\u308b\u7bb1
-byte[] receivedBytes = new byte[300000];
- 
 
 public void setup() {
-  size(640*2, 480);
-
-  chatServer = new Server(this,2001);
-
+  size(640, 480);
 
   kinect = new SimpleOpenNI(this);
   kinect.enableDepth();
   kinect.enableUser(SimpleOpenNI.SKEL_PROFILE_ALL);
   
-  pose = new poseOperation(kinect,ardrone);
-  send =  new send_ARdrone_comand();
-  // \u30c6\u30ad\u30b9\u30c8\u306e\u592a\u3055
-  strokeWeight(5);
+  pose = new poseOperation(kinect);
 
-  try {
-    //\u53d7\u4fe1\u30dd\u30fc\u30c8
-    receiveSocket = new DatagramSocket(5100);
-  }
-  catch(SocketException e) {
-  }
-  //\u53d7\u4fe1\u7528\u30d1\u30b1\u30c3\u30c8
-  receivePacket = new DatagramPacket(receivedBytes,receivedBytes.length);
-  try{
-    receiveSocket.setSoTimeout(1000);
-  }catch(SocketException e){
-  }
+  con = new ArDroneOrder();
+  con.yaw = 0;
+  con.roll = 0;
+  strokeWeight(5);
 }
 
 
 public void draw() {
-  background(204);
+  background(204);  
   
-  cl =chatServer.available();
-  if(cl !=null) println("connected");
- 
-  //AR\u30ab\u30e1\u30e9\u6620\u50cf\u306e\u53d6\u5f97
-  try {
-    receiveSocket.receive(receivePacket);
-  }
-  catch(IOException e) {
-  } 
-  Image awtImage = Toolkit.getDefaultToolkit().createImage(receivedBytes);
-  PImage receiveImage = loadImageMT(awtImage);
-  //AR\u30ab\u30e1\u30e9\u63cf\u753b
-  image(receiveImage,640,0, 640, 480);
+  // float yaw = ardrone.getYaw();
+  // float altitude = ardrone.getAltitude();
+  // velocity = ardrone.getVelocity();
+  // int battery = ardrone.getBatteryPercentage();
+  // textSize(16);
+  // String attitude = "pitch:" + pitch + "\nroll:" + roll + "\nyaw:" + yaw + "\naltitude:" + altitude;
+  // text(attitude, 660, 300);
+  // String vel = "vx:" + velocity[0] + "\nvy:" + velocity[1];
+  // text(vel, 660, 440);
+  // String bat = "battery:" + battery + " %";
+  // text(bat, 1060, 470);
+  // textSize(50); 
 
-
-  textSize(50);  
   kinect.update();  
   image(kinect.depthImage(), 0, 0);
 
   IntVector userList = new IntVector();
   kinect.getUsers(userList);
-  if (userList.size() > 0) {
+
+if (userList.size() > 0) {
     int userId = userList.get(0);
-    if(kinect.isTrackingSkeleton(userId)) {
-      send = pose.posePressed(userId);
-      msg = send.yaw + ":" + send.roll;
-      chatServer.write(msg);
-      msg="";
+    if ( kinect.isTrackingSkeleton(userId)) {
+      con = pose.posePressed(userId);
       drawSkeleton(userId);
     }else{
+      con.yaw = 0;
+      con.roll = 0;
     }
   }
-
+  
 }
 
 public void drawSkeleton(int userId) {
@@ -184,6 +140,55 @@ public void drawSkeleton(int userId) {
   kinect.drawLimb(userId, SimpleOpenNI.SKEL_RIGHT_HIP, SimpleOpenNI.SKEL_RIGHT_KNEE);
   kinect.drawLimb(userId, SimpleOpenNI.SKEL_RIGHT_KNEE, SimpleOpenNI.SKEL_RIGHT_FOOT);
   kinect.drawLimb(userId, SimpleOpenNI.SKEL_RIGHT_HIP, SimpleOpenNI.SKEL_LEFT_HIP);
+}
+
+public void keyPressed() {
+  if (key == CODED) {
+    if (keyCode == UP) {
+
+    }
+    else if (keyCode == DOWN) {
+    }
+    else if (keyCode == LEFT) {
+    }
+    else if (keyCode == RIGHT) {
+    }
+    else if (keyCode == SHIFT) {
+    }
+    else if (keyCode == CONTROL) {
+    }
+  }
+  else {
+    if (key == 's') {
+    }
+    else if (key == 'r') {
+    }
+    else if (key == 'l') {
+    }
+    else if (key == 'u') {
+    }
+    else if (key == 'd') {
+    }
+    else if (key == 'z') {
+    }
+    else if (key == 'x') {
+    }
+    else if (key == 'c') {
+    }
+    else if (key == 'v') {
+    }
+    else if (key == 'b') {
+    }
+    else if (key == 'n') {
+    }
+    else if (key == 'e') {
+      noLoop(); 
+      exit(); //end proglam
+    }
+  }
+}
+public void keyReleased() {
+
 }
 
 // user-tracking callbacks!
@@ -209,25 +214,25 @@ public void onStartPose(String pose, int userId) {
   kinect.requestCalibrationSkeleton(userId, true);
 }
 
-
-public void keyPressed() {
-    int dmy;
-    msg = msg + key;
-    if(key =='\n') {
-      chatServer.write(msg);//\u30b5\u30fc\u30d0\u30fc\u306b\u6570\u5b57\u3092\u9001\u308b
-      msg="";
-    }
+public void exit() {
+  //\u3053\u3053\u306b\u7d42\u4e86\u51e6\u7406
+  // ardrone.stop();
+  // ardrone.landing();
+  println("exit");
+  super.exit();
 }
+
 public  int count;
 
-class send_ARdrone_comand{
+class ArDroneOrder{
   int yaw;
   int roll;
 }
 
+
 class poseOperation{
   SimpleOpenNI context;
-  
+
   PVector rightHand = new PVector();
   PVector rightElbow = new PVector();
   PVector rightShoulder = new PVector();
@@ -251,21 +256,18 @@ class poseOperation{
   int move_speed = 50;
   
   final int DelayTime = 10;
-
-  send_ARdrone_comand send_comand = new send_ARdrone_comand();
   
   float playerRoll;
   float playerYaw;
 
-  poseOperation(SimpleOpenNI context, ARDroneForP5 ardrone){
+  poseOperation(SimpleOpenNI context){
     this.context = context;
-    this.ardrone = ardrone;
     count = 0;
     flag = 0;
     textSize(50);
   }
   
-  public send_ARdrone_comand posePressed(int userId){
+  public ArDroneOrder posePressed(int userId){
 
     context.getJointPositionSkeleton(userId, SimpleOpenNI.SKEL_RIGHT_HAND, rightHand);
     context.getJointPositionSkeleton(userId, SimpleOpenNI.SKEL_RIGHT_ELBOW, rightElbow);
@@ -299,26 +301,21 @@ class poseOperation{
       playerYaw = 0;
     }
     
-
-    // println("playerRoll: " + playerRoll);
-    // println("playerYaw: " + playerYaw);
+    ArDroneOrder poseCon = new ArDroneOrder();
 
     playerRoll = playerRoll/move_speed;
     playerYaw = playerYaw/(move_speed-10);
-
-    // println("playerRoll: " + playerRoll);
-    // println("playerYaw: " + playerYaw);
 
     if(abs(playerRoll) < 5){
       playerRoll = 0;
     }else{
       if(playerRoll>0){
-        text("left", 700,200);
+        text("left", 100,200);
         if(playerRoll > 30){
           playerRoll = 30;
         }
       }else if(playerRoll<0){
-        text("right", 700,200);
+        text("right", 100,200);
         if(playerRoll < -30){
           playerRoll = -30;
         }
@@ -329,12 +326,12 @@ class poseOperation{
       playerYaw = 0;
     }else{
       if(playerYaw>0){
-        text("forward", 700,100);
+        text("forward", 100,100);
         if(playerYaw>30){
           playerYaw = 30;
         }
       }else if(playerYaw<0){
-        text("back", 700,100);
+        text("back", 100,100);
           playerYaw  = playerYaw;
         if(playerYaw<-30){
           playerYaw = -30;
@@ -344,13 +341,15 @@ class poseOperation{
 
     if(playerYaw != 0 || playerRoll != 0){
       stroke(0,255,255);
-      send_comand.yaw = (int)playerYaw;
-      send_comand.roll =  (int)playerRoll;
+      poseCon.yaw = (int)playerYaw;
+      poseCon.roll = (int)playerRoll;
     }else{
       stroke(255,255,255);
-      send_comand.yaw = 0;
-      send_comand.roll =  0;
+      poseCon.yaw = 0;
+      poseCon.roll = 0;
+      // ardrone.stop();
     } 
+    return poseCon;
   }
 }
   static public void main(String[] passedArgs) {

@@ -76,14 +76,16 @@ public class server extends PApplet {
 
 
 
-// InetSocketAddress remoteAddress;
 DatagramPacket sendPacket;
 DatagramPacket receivePacket;
 DatagramSocket receiveSocket;
 
-// Server server;
+Server chatServer;
+Client cl;
 
+String msg;
 
+byte[] sendBytes;
 //\u53d7\u4fe1\u3059\u308b\u30d0\u30a4\u30c8\u914d\u5217\u3092\u683c\u7d0d\u3059\u308b\u7bb1
 byte[] receivedBytes = new byte[300000];
  
@@ -91,7 +93,9 @@ byte[] receivedBytes = new byte[300000];
 public void setup() {
   size(640, 480);
   
-    remoteAddress = new InetSocketAddress("localhost",5000);
+    // remoteAddress = new InetSocketAddress("localhost",5000);
+
+    chatServer = new Server(this,2001);
 
   try {
     //\u53d7\u4fe1\u30dd\u30fc\u30c8
@@ -110,15 +114,16 @@ public void setup() {
 
 public void draw() {
   background(204);
-  // Client c = server.available();
-  // if(c != null){
-  //   String s = c.readString();
-  //   text("S",100,100);
-  //   println(s);
-  //   server.write(s);
+  
+  cl =chatServer.available();
+  if(cl !=null) println("connected");
+  //\u30af\u30e9\u30a4\u30a2\u30f3\u30c8\u304cnull\u3067\u306a\u3044\u306a\u3089\u30eb\u30fc\u30d7\u3078
+  // if((cl != null)&&(cl.available()>0)) {
+  //   msg=cl.readStringUntil('\n');
+  //   println(msg);
+  //   // chatServer.write(msg);//\u5168\u54e1\u306b\u9001\u4fe1
   // }
 
-  // println(receiveSocket.isBound());
   try {
     receiveSocket.receive(receivePacket);
   }
@@ -134,9 +139,11 @@ public void draw() {
 
 
 public void keyPressed() {
-
-    if (key == 's') {
-      
+    int dmy;
+    msg = msg + key;
+    if(key =='\n') {
+      chatServer.write(msg);//\u30b5\u30fc\u30d0\u30fc\u306b\u6570\u5b57\u3092\u9001\u308b
+      msg="";
     }
 }
   static public void main(String[] passedArgs) {

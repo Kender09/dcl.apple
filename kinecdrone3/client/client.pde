@@ -1,67 +1,107 @@
-import SimpleOpenNI.*;
 import processing.net.*;
+
+import SimpleOpenNI.*;
+
+import processing.video.*;
+import java.awt.image.*;
+import java.awt.*;
+import javax.imageio.*;
+import java.net.DatagramPacket;  
+import java.net.DatagramSocket;
+import java.net.*;
+
+import java.*;
 
 SimpleOpenNI  kinect;
 
-poseOperation pose;
+PoseOperation pose;
+
 ArDroneOrder con;
 
-Client client;
+DatagramPacket sendPacket;
+DatagramPacket receivePacket;
+DatagramSocket receiveSocket;
 
-public float[] velocity;
-public float pitch;
-public float roll;
+Server chatServer;
+Client cl;
 
+String msg;
+
+byte[] sendBytes;
+//受信するバイト配列を格納する箱
+byte[] receivedBytes = new byte[300000];
+ 
 
 void setup() {
-  size(640, 480);
+  size(640*2, 480);
+
+  chatServer = new Server(this,2001);
+
 
   kinect = new SimpleOpenNI(this);
   kinect.enableDepth();
   kinect.enableUser(SimpleOpenNI.SKEL_PROFILE_ALL);
   
-  pose = new poseOperation(kinect);
+  pose = new PoseOperation(kinect,ardrone);
+  send =  new send_ARdrone_comand();
 
   con = new ArDroneOrder();
   con.yaw = 0;
   con.roll = 0;
+  // テキストの太さ
   strokeWeight(5);
+
+  try {
+    //受信ポート
+    receiveSocket = new DatagramSocket(5100);
+  }
+  catch(SocketException e) {
+  }
+  //受信用パケット
+  receivePacket = new DatagramPacket(receivedBytes,receivedBytes.length);
+  try{
+    receiveSocket.setSoTimeout(1000);
+  }catch(SocketException e){
+  }
 }
 
 
 void draw() {
-  background(204);  
+  background(204);
   
-  // float yaw = ardrone.getYaw();
-  // float altitude = ardrone.getAltitude();
-  // velocity = ardrone.getVelocity();
-  // int battery = ardrone.getBatteryPercentage();
-  // textSize(16);
-  // String attitude = "pitch:" + pitch + "\nroll:" + roll + "\nyaw:" + yaw + "\naltitude:" + altitude;
-  // text(attitude, 660, 300);
-  // String vel = "vx:" + velocity[0] + "\nvy:" + velocity[1];
-  // text(vel, 660, 440);
-  // String bat = "battery:" + battery + " %";
-  // text(bat, 1060, 470);
-  // textSize(50); 
+  cl =chatServer.available();
+  if(cl !=null) println("connected");
+ 
+  //ARカメラ映像の取得
+  try {
+    receiveSocket.receive(receivePacket);
+  }
+  catch(IOException e) {
+  } 
+  Image awtImage = Toolkit.getDefaultToolkit().createImage(receivedBytes);
+  PImage receiveImage = loadImageMT(awtImage);
+  //ARカメラ描画
+  image(receiveImage,640,0, 640, 480);
 
+
+  textSize(50);  
   kinect.update();  
   image(kinect.depthImage(), 0, 0);
 
   IntVector userList = new IntVector();
   kinect.getUsers(userList);
-
-if (userList.size() > 0) {
+  if (userList.size() > 0) {
     int userId = userList.get(0);
-    if ( kinect.isTrackingSkeleton(userId)) {
-      con = pose.posePressed(userId);
+    if(kinect.isTrackingSkeleton(userId)) {
+      send = pose.posePressed(userId);
+      msg = send.yaw + ":" + send.roll;
+      chatServer.write(msg);
+      msg="";
       drawSkeleton(userId);
     }else{
-      con.yaw = 0;
-      con.roll = 0;
     }
   }
-  
+
 }
 
 void drawSkeleton(int userId) {
@@ -81,55 +121,6 @@ void drawSkeleton(int userId) {
   kinect.drawLimb(userId, SimpleOpenNI.SKEL_RIGHT_HIP, SimpleOpenNI.SKEL_RIGHT_KNEE);
   kinect.drawLimb(userId, SimpleOpenNI.SKEL_RIGHT_KNEE, SimpleOpenNI.SKEL_RIGHT_FOOT);
   kinect.drawLimb(userId, SimpleOpenNI.SKEL_RIGHT_HIP, SimpleOpenNI.SKEL_LEFT_HIP);
-}
-
-void keyPressed() {
-  if (key == CODED) {
-    if (keyCode == UP) {
-
-    }
-    else if (keyCode == DOWN) {
-    }
-    else if (keyCode == LEFT) {
-    }
-    else if (keyCode == RIGHT) {
-    }
-    else if (keyCode == SHIFT) {
-    }
-    else if (keyCode == CONTROL) {
-    }
-  }
-  else {
-    if (key == 's') {
-    }
-    else if (key == 'r') {
-    }
-    else if (key == 'l') {
-    }
-    else if (key == 'u') {
-    }
-    else if (key == 'd') {
-    }
-    else if (key == 'z') {
-    }
-    else if (key == 'x') {
-    }
-    else if (key == 'c') {
-    }
-    else if (key == 'v') {
-    }
-    else if (key == 'b') {
-    }
-    else if (key == 'n') {
-    }
-    else if (key == 'e') {
-      noLoop(); 
-      exit(); //end proglam
-    }
-  }
-}
-void keyReleased() {
-
 }
 
 // user-tracking callbacks!
@@ -155,11 +146,12 @@ void onStartPose(String pose, int userId) {
   kinect.requestCalibrationSkeleton(userId, true);
 }
 
-void exit() {
-  //ここに終了処理
-  // ardrone.stop();
-  // ardrone.landing();
-  println("exit");
-  super.exit();
-}
 
+void keyPressed() {
+    int dmy;
+    msg = msg + key;
+    if(key =='\n') {
+      chatServer.write(msg);//サーバーに数字を送る
+      msg="";
+    }
+}
