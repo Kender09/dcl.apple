@@ -17,6 +17,11 @@ DatagramSocket receiveSocket;
 
 // Server server;
 
+Server chatServer;
+Client cl;
+
+String msg,smsg;
+
 byte[] sendBytes;
 //受信するバイト配列を格納する箱
 byte[] receivedBytes = new byte[300000];
@@ -25,7 +30,9 @@ byte[] receivedBytes = new byte[300000];
 void setup() {
   size(640, 480);
   
-    remoteAddress = new InetSocketAddress("localhost",5000);
+    // remoteAddress = new InetSocketAddress("localhost",5000);
+
+    chatServer = new Server(this,2001);
 
   try {
     //受信ポート
@@ -44,15 +51,17 @@ void setup() {
 
 void draw() {
   background(204);
-  // Client c = server.available();
-  // if(c != null){
-  //   String s = c.readString();
-  //   text("S",100,100);
-  //   println(s);
-  //   server.write(s);
-  // }
+  
+  String msg;
+  cl =chatServer.available();
+  if(cl !=null) println("connected");
+  //クライアントがnullでないならループへ
+  if((cl != null)&&(cl.available()>0)) {
+    msg=cl.readStringUntil('\n');
+    println(msg);
+    // chatServer.write(msg);//全員に送信
+  }
 
-  // println(receiveSocket.isBound());
   try {
     receiveSocket.receive(receivePacket);
   }
@@ -68,8 +77,10 @@ void draw() {
 
 
 void keyPressed() {
-
-    if (key == 's') {
-      
+    int dmy;
+    msg = msg + key;
+    if(key =='\n') {
+      chatServer.write(msg);//サーバーに数字を送る
+      msg="";
     }
 }

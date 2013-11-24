@@ -24,28 +24,26 @@ byte[] sendBytes;
 
 byte[] receivedBytes = new byte[300000];
 
+Client chatClient;
+float Val;
+String msg,smsg;
+String id;
+
 void setup() {
   size(640, 480);
   // client = new Client(this, "127.0.0.1",20000);
 
   remoteAddress = new InetSocketAddress("localhost",5100);
+
+
   // try{
   //   receiveSocket.setSoTimeout(1000);
   // }catch(SocketException e){
   // }
+  chatClient = new Client(this, "127.0.0.1", 2001);
 
-  try {
-    //受信ポート
-    receiveSocket = new DatagramSocket(5000);
-  }
-  catch(SocketException e) {
-  }
-  //受信用パケット
-  receivePacket = new DatagramPacket(receivedBytes,receivedBytes.length);
-  try{
-    receiveSocket.setSoTimeout(1000);
-  }catch(SocketException e){
-  }
+  msg="";
+  id="taro>";
 
   ardrone = new ARDroneForP5("192.168.1.1");
   ardrone.connect();  
@@ -68,7 +66,10 @@ void draw() {
   // image(img, 0, 0,640,480);
   }
   // capture.read();
-
+  if(chatClient.available()>0){
+    smsg=chatClient.readStringUntil('\n');
+    println(smsg);
+  }
 
    //バッファーイメージに変換
   BufferedImage bfImage = PImage2BImage(img);
@@ -109,12 +110,12 @@ BufferedImage PImage2BImage(PImage pImg) {
 }  
 
 void keyPressed() {
-  String s;
-    if (key == 's') {
-      s = "s";
-      text("PUSH[S]",100,100);
-      // client.write(s);
-    }
+  int dmy;
+  msg = msg + key;
+  if(key =='\n') {
+    chatClient.write(id+msg);//サーバーに数字を送る
+    msg="";
+  }
 }
 
 
