@@ -22,6 +22,7 @@ AR.Droneのカメラ映像をリアルタイムにHMDに表示させる。
 ### 予定
 - AR.DroneをPCで操作できる簡単なプログラムの作成。
 - キネクトを用いて寝そべった状態の人の手と足を認識し何個かのジェスチャー操作が選択されるようにする。
+- https://docs.google.com/spreadsheet/ccc?key=0AvoRXDOzrJFTdGl5LVNaWmVQUG1qTzdQYWlOeDU3T1E&usp=sharing#gid=1
 
 ### アイディア
 
