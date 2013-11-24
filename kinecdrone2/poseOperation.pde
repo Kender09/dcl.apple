@@ -67,8 +67,8 @@ class poseOperation{
     
     if(playerYaw > head.y){
       playerYaw = playerYaw - head.y;
-    }else if(playerYaw < torso.y){
-      playerYaw = playerYaw - torso.y;
+    }else if(playerYaw < (torso.y + baseScale/3.0) ){
+      playerYaw = playerYaw - (torso.y + baseScale/3.0);
     }else{
       playerYaw = 0;
     }
@@ -109,7 +109,7 @@ class poseOperation{
         }
       }else if(playerYaw<0){
         text("back", 700,100);
-          playerYaw  = playerYaw - 5;
+          playerYaw  = playerYaw;
         if(playerYaw<-30){
           playerYaw = -30;
         }

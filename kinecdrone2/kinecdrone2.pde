@@ -32,6 +32,7 @@ void setup() {
   ardrone.connectVideo();
   //start the connections.
   ardrone.start();
+  
   kinect = new SimpleOpenNI(this);
   kinect.enableDepth();
   kinect.enableUser(SimpleOpenNI.SKEL_PROFILE_ALL);
