@@ -67,10 +67,10 @@ void setup() {
 
 void draw() {
   background(204);
-  
-  cl =chatServer.available();
+
+    cl = chatServer.available();
   if(cl !=null) println("connected");
- 
+
   //ARカメラ映像の取得
   try {
     receiveSocket.receive(receivePacket);
@@ -94,13 +94,14 @@ void draw() {
     int userId = userList.get(0);
     if( kinect.isTrackingSkeleton(userId) ){
       con = pose.posePressed(userId);
-      msg = con.yaw + ":" + con.roll;
-      chatServer.write(msg);
-      msg="";
+      msg = con.yaw + ":" + con.roll + "\n";
+      println(msg);
       drawSkeleton(userId);
+      chatServer.write(msg);
     }else{
       con.yaw = 0;
       con.roll = 0;
+      msg = con.yaw + ":" + con.roll + "\n";
     }
   }
 

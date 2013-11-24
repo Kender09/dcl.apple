@@ -134,10 +134,10 @@ public void setup() {
 
 public void draw() {
   background(204);
-  
-  cl =chatServer.available();
+
+    cl = chatServer.available();
   if(cl !=null) println("connected");
- 
+
   //AR\u30ab\u30e1\u30e9\u6620\u50cf\u306e\u53d6\u5f97
   try {
     receiveSocket.receive(receivePacket);
@@ -161,13 +161,14 @@ public void draw() {
     int userId = userList.get(0);
     if( kinect.isTrackingSkeleton(userId) ){
       con = pose.posePressed(userId);
-      msg = con.yaw + ":" + con.roll;
-      chatServer.write(msg);
-      msg="";
+      msg = con.yaw + ":" + con.roll + "\n";
+      println(msg);
       drawSkeleton(userId);
+      chatServer.write(msg);
     }else{
       con.yaw = 0;
       con.roll = 0;
+      msg = con.yaw + ":" + con.roll + "\n";
     }
   }
 
