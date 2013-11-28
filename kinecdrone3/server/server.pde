@@ -27,11 +27,12 @@ String smsg;
 
 void setup() {
   size(640, 480);
+  String ip_addr = "192.168.10.38";
 
-  remoteAddress = new InetSocketAddress("192.168.10.42",5100);
+  remoteAddress = new InetSocketAddress(ip_addr,5100);
 
 
-  chatClient = new Client(this, "192.168.10.42", 2001);
+  chatClient = new Client(this, ip_addr, 2001);
 
 
   ardrone = new ARDroneForP5("192.168.1.1");
@@ -57,7 +58,14 @@ void draw() {
   // capture.read();
   if(chatClient.available()>0){
     smsg=chatClient.readStringUntil('\n');
-    println(smsg);
+    // println(smsg);
+    // 文字列からyaw,rollの数値を取得
+    Int [] yaw_roll = int(split(smsg, ":"));
+
+    // ardrone操作の命令
+    println("yaw_roll >>>>>>>> ");
+    println(yaw_roll[0] + " " yaw_roll[1]);
+//    ardrone.move3D(yaw_roll[0], yaw_roll[1], 0, 0);
   }
 
    //バッファーイメージに変換
