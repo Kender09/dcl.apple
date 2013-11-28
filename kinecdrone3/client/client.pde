@@ -33,7 +33,7 @@ byte[] receivedBytes = new byte[300000];
  
 
 void setup() {
-  size(640*2, 480);
+  size(640*2, 800);
 
   chatServer = new Server(this,2001);
 
@@ -80,13 +80,13 @@ void draw() {
   Image awtImage = Toolkit.getDefaultToolkit().createImage(receivedBytes);
   PImage receiveImage = loadImageMT(awtImage);
   //ARカメラ描画
-  image(receiveImage,640,0, 640, 480);
-
+  image(receiveImage,640,0, 640, 800);
+  image(receiveImage,0,0, 640, 800);
 
   //kinect プログラム
   textSize(50);  
   kinect.update();  
-  image(kinect.depthImage(), 0, 0);
+  image(kinect.depthImage(), 0, 700,100,100);
 
   IntVector userList = new IntVector();
   kinect.getUsers(userList);
