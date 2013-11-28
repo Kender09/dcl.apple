@@ -153,7 +153,8 @@ public void draw() {
   //kinect \u30d7\u30ed\u30b0\u30e9\u30e0
   textSize(50);  
   kinect.update();  
-  image(kinect.depthImage(), 0, 700,100,100);
+  image(kinect.depthImage(), 0, 800-(480/4),640/4,480/4);
+  image(kinect.depthImage(), 640, 800-(480/4),640/4,480/4);
 
   IntVector userList = new IntVector();
   kinect.getUsers(userList);
@@ -163,7 +164,7 @@ public void draw() {
       con = pose.posePressed(userId);
       msg = con.yaw + ":" + con.roll + "\n";
       println(msg);
-      drawSkeleton(userId);
+      // drawSkeleton(userId);
       chatServer.write(msg);
     }else{
       con.yaw = 0;
@@ -318,11 +319,13 @@ class PoseOperation{
       playerRoll = 0;
     }else{
       if(playerRoll>0){
+        text("left", 100,200);
         text("left", 700,200);
         if(playerRoll > 30){
           playerRoll = 30;
         }
       }else if(playerRoll<0){
+        text("right", 100,200);
         text("right", 700,200);
         if(playerRoll < -30){
           playerRoll = -30;
@@ -334,11 +337,13 @@ class PoseOperation{
       playerYaw = 0;
     }else{
       if(playerYaw>0){
+        text("forward", 100,100);
         text("forward", 700,100);
         if(playerYaw>30){
           playerYaw = 30;
         }
       }else if(playerYaw<0){
+        text("back", 100,100);
         text("back", 700,100);
           playerYaw  = playerYaw;
         if(playerYaw<-30){

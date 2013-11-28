@@ -91,11 +91,13 @@ class PoseOperation{
       playerRoll = 0;
     }else{
       if(playerRoll>0){
+        text("left", 100,200);
         text("left", 700,200);
         if(playerRoll > 30){
           playerRoll = 30;
         }
       }else if(playerRoll<0){
+        text("right", 100,200);
         text("right", 700,200);
         if(playerRoll < -30){
           playerRoll = -30;
@@ -107,11 +109,13 @@ class PoseOperation{
       playerYaw = 0;
     }else{
       if(playerYaw>0){
+        text("forward", 100,100);
         text("forward", 700,100);
         if(playerYaw>30){
           playerYaw = 30;
         }
       }else if(playerYaw<0){
+        text("back", 100,100);
         text("back", 700,100);
           playerYaw  = playerYaw;
         if(playerYaw<-30){

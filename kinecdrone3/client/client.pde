@@ -86,7 +86,8 @@ void draw() {
   //kinect プログラム
   textSize(50);  
   kinect.update();  
-  image(kinect.depthImage(), 0, 700,100,100);
+  image(kinect.depthImage(), 0, 800-(480/4),640/4,480/4);
+  image(kinect.depthImage(), 640, 800-(480/4),640/4,480/4);
 
   IntVector userList = new IntVector();
   kinect.getUsers(userList);
@@ -96,7 +97,7 @@ void draw() {
       con = pose.posePressed(userId);
       msg = con.yaw + ":" + con.roll + "\n";
       println(msg);
-      drawSkeleton(userId);
+      // drawSkeleton(userId);
       chatServer.write(msg);
     }else{
       con.yaw = 0;
