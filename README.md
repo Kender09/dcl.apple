@@ -1,4 +1,20 @@
 中島研プロジェクト研究
+
+/code 
+
+/kinecdrone2
+PC１台でdrone制御の（前記の内容）
+
+/net_test
+processingのソケット通信テスト
+
+/OculusSDK
+Oculus制御するSDK（11/28現在未使用）
+
+/Processing
+/Processing/Examples/Oculus riftにオキュラス用の動画生成するサンプル。
+
+
 =======
 
 チームアップル
