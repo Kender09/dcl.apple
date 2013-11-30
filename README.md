@@ -1,5 +1,10 @@
 中島研プロジェクト研究
 
+
+=======
+
+ディレクトリ説明
+
 /code 
 
 /kinecdrone2
@@ -13,6 +18,15 @@ Oculus制御するSDK（11/28現在未使用）
 
 /Processing
 /Processing/Examples/Oculus riftにオキュラス用の動画生成するサンプル。
+
+/vr.js
+Oculusのセンサー値を読み取るためのプラグイン
+
+/three.js
+/three.js/example/js/effects/OculusRiftEffect.js　が動画をオキュラス用に変換するサンプル
+
+/processing.js(1.4.1)
+processingをjsで動かす
 
 
 =======
