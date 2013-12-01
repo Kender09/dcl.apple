@@ -12,9 +12,8 @@ import java.net.*;
 
 import java.*;
 
-import fullscreen.*; 
-
-FullScreen fs;
+// import fullscreen.*; 
+// FullScreen fs;
 
 SimpleOpenNI  kinect;
 
@@ -36,11 +35,24 @@ byte[] sendBytes;
 byte[] receivedBytes = new byte[300000];
  
 
-void setup() {
-  size(640*2, 800);
+//oculur riftように画像変換
+PShader barrel;
+PGraphics fb;
+PGraphics scene;
+int eye_width = 640;
+int eye_height = 800;
 
-  fs = new FullScreen(this); 
-  fs.enter();
+void setup() {
+  size(640*2, 800, P3D);
+
+  // fs = new FullScreen(this); 
+  // fs.enter();
+
+  fb = createGraphics(width, height, P3D);
+  // Create PGraphics for actual scene
+  scene = createGraphics(eye_width, eye_height, P3D);
+  // Load fragment shader for oculus rift barrel distortion
+  barrel = loadShader("barrel_frag.glsl");  
 
   chatServer = new Server(this,2001);
 
@@ -72,7 +84,7 @@ void setup() {
 
 
 void draw() {
-  background(204);
+  background(0);
 
     cl = chatServer.available();
   if(cl !=null) println("connected");
@@ -85,16 +97,15 @@ void draw() {
   } 
   Image awtImage = Toolkit.getDefaultToolkit().createImage(receivedBytes);
   PImage receiveImage = loadImageMT(awtImage);
-  ARカメラ描画
-  image(receiveImage,640,0, 640, 800);
-  image(receiveImage,0,0, 640, 800);
+  // ARカメラ描画
+  // image(receiveImage,640,0, 640, 800);
+  // image(receiveImage,0,0, 640, 800);
 
   //kinect プログラム
   textSize(50);  
   kinect.update();  
-  image(kinect.depthImage(), 0, 800-(480/4),640/4,480/4);
-   // image(kinect.depthImage(), 640, 800-(480/4),640/4,480/4);
-
+  // image(kinect.depthImage(), 0, 800-(480/4),640/4,480/4);
+  // image(kinect.depthImage(), 640, 800-(480/4),640/4,480/4);
 
   IntVector userList = new IntVector();
   kinect.getUsers(userList);
@@ -112,6 +123,35 @@ void draw() {
       msg = con.yaw + ":" + con.roll + "\n";
     }
   }
+
+  //oculusriftように映像を処理
+  scene.beginDraw();
+  scene.background(0);
+  scene.image(receiveImage, 0, 0, 640, 800);
+  scene.image(kinect.depthImage(), 0, 800-(480/2), 640/2,480/2);
+  scene.translate(scene.width/2, scene.height/2, 100);
+  scene.endDraw();
+
+  blendMode(ADD);
+   // Render left eye
+  set_shader("left");
+  shader(barrel);
+  fb.beginDraw();
+  fb.background(0);
+  fb.image(scene, 50, 0, eye_width, eye_height);
+  fb.endDraw();
+  image(fb, 0, 0);
+  
+  resetShader();
+  
+  // Render right eye
+  set_shader("right");
+  shader(barrel);
+  fb.beginDraw();
+  fb.background(0);
+  fb.image(scene, eye_width-50, 0, eye_width, eye_height);
+  fb.endDraw();
+  image(fb, 0, 0);
 
 }
 
@@ -165,4 +205,44 @@ void keyPressed() {
       chatServer.write(msg);//サーバーに数字を送る
       msg="";
     }
+}
+
+void set_shader(String eye)
+{
+  float x = 0.0;
+  float y = 0.0;
+  float w = 0.5;
+  float h = 1.0;
+  float DistortionXCenterOffset = 0.25;
+  float as = w/h;
+
+  float K0 = 1.0f;
+  float K1 = 0.22f;
+  float K2 = 0.24f;
+  float K3 = 0.0f;
+
+  float scaleFactor = 0.7f;
+
+  if (eye == "left")
+  {
+    x = 0.0f;
+    y = 0.0f;
+    w = 0.5f;
+    h = 1.0f;
+    DistortionXCenterOffset = 0.25f;
+  }
+  else if (eye == "right")
+  {
+    x = 0.5f;
+    y = 0.0f;
+    w = 0.5f;
+    h = 1.0f;
+    DistortionXCenterOffset = -0.25f;
+  }
+
+  barrel.set("LensCenter", x + (w + DistortionXCenterOffset * 0.5f)*0.5f, y + h*0.5f);
+  barrel.set("ScreenCenter", x + w*0.5f, y + h*0.5f);
+  barrel.set("Scale", (w/2.0f) * scaleFactor, (h/2.0f) * scaleFactor * as);
+  barrel.set("ScaleIn", (2.0f/w), (2.0f/h) / as);
+  barrel.set("HmdWarpParam", K0, K1, K2, K3);
 }

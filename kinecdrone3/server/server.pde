@@ -44,16 +44,18 @@ void setup() {
   //start the connections.
   ardrone.start();
 
+  textSize(50);  
+
 }
 
 
 void draw() {
-  background(204);  
+  background(0);  
   PImage img = ardrone.getVideoImage(false);
   if (img == null){
     return;
   }else{
-  // image(img, 0, 0,640,480);
+    // image(img, 0, 0,640,480);
   }
   // capture.read();
   if(chatClient.available()>0){
@@ -64,6 +66,7 @@ void draw() {
 
     // ardrone操作の命令
     println(yaw_roll[0] + " : " + yaw_roll[1]);
+    text(yaw_roll[0] + " : " + yaw_roll[1], 400,100);
     ardrone.move3D(yaw_roll[0], yaw_roll[1], 0, 0);
   }
 

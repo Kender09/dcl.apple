@@ -93,7 +93,7 @@ String smsg;
 
 public void setup() {
   size(640, 480);
-  String ip_addr = "192.168.10.38";
+  String ip_addr = "localhost";
 
   remoteAddress = new InetSocketAddress(ip_addr,5100);
 
@@ -130,7 +130,7 @@ public void draw() {
 
     // ardrone\u64cd\u4f5c\u306e\u547d\u4ee4
     println(yaw_roll[0] + " : " + yaw_roll[1]);
-    ardrone.move3D(yaw_roll[0], yaw_roll[1], 0, 0);
+    // ardrone.move3D(yaw_roll[0], yaw_roll[1], 0, 0);
   }
 
    //\u30d0\u30c3\u30d5\u30a1\u30fc\u30a4\u30e1\u30fc\u30b8\u306b\u5909\u63db
@@ -158,7 +158,7 @@ public void draw() {
   }
   catch(SocketException e) {
   }
-  // image(img, 0, 0,640,480);
+  image(img, 0, 0,640,480);
 }
 
 public BufferedImage PImage2BImage(PImage pImg) {  
@@ -183,9 +183,9 @@ public void keyPressed() {
     else if (keyCode == LEFT)  ardrone.move3D(0, 10, 0, 0);//go left
     else if (keyCode == RIGHT) ardrone.move3D(0, -10, 0, 0);//go right
     else if (keyCode == SHIFT){
-      ardrone.takeOff();//take off
-      println("takeOff");
-      text("takeOff", 100,100);
+      // ardrone.takeOff();//take off
+      // println("takeOff");
+      // text("takeOff", 100,100);
     }
     else if (keyCode == CONTROL) {
       ardrone.landing();//land

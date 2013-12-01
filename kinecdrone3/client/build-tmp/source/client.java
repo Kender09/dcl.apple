@@ -13,7 +13,6 @@ import java.net.DatagramPacket;
 import java.net.DatagramSocket; 
 import java.net.*; 
 import java.*; 
-import fullscreen.*; 
 
 import org.slf4j.helpers.*; 
 import com.xuggle.xuggler.video.*; 
@@ -80,9 +79,8 @@ public class client extends PApplet {
 
 
 
- 
-
-FullScreen fs;
+// import fullscreen.*; 
+// FullScreen fs;
 
 SimpleOpenNI  kinect;
 
@@ -104,11 +102,24 @@ byte[] sendBytes;
 byte[] receivedBytes = new byte[300000];
  
 
-public void setup() {
-  size(640*2, 800);
+//oculur rift\u3088\u3046\u306b\u753b\u50cf\u5909\u63db
+PShader barrel;
+PGraphics fb;
+PGraphics scene;
+int eye_width = 640;
+int eye_height = 800;
 
-  fs = new FullScreen(this); 
-  fs.enter();
+public void setup() {
+  size(640*2, 800, P3D);
+
+  // fs = new FullScreen(this); 
+  // fs.enter();
+
+  fb = createGraphics(width, height, P3D);
+  // Create PGraphics for actual scene
+  scene = createGraphics(eye_width, eye_height, P3D);
+  // Load fragment shader for oculus rift barrel distortion
+  barrel = loadShader("barrel_frag.glsl");  
 
   chatServer = new Server(this,2001);
 
@@ -140,7 +151,7 @@ public void setup() {
 
 
 public void draw() {
-  background(204);
+  background(0);
 
     cl = chatServer.available();
   if(cl !=null) println("connected");
@@ -153,7 +164,7 @@ public void draw() {
   } 
   Image awtImage = Toolkit.getDefaultToolkit().createImage(receivedBytes);
   PImage receiveImage = loadImageMT(awtImage);
-  //AR\u30ab\u30e1\u30e9\u63cf\u753b
+  // AR\u30ab\u30e1\u30e9\u63cf\u753b
   // image(receiveImage,640,0, 640, 800);
   // image(receiveImage,0,0, 640, 800);
 
@@ -162,9 +173,6 @@ public void draw() {
   kinect.update();  
   // image(kinect.depthImage(), 0, 800-(480/4),640/4,480/4);
   // image(kinect.depthImage(), 640, 800-(480/4),640/4,480/4);
-  
-  image(kinect.depthImage(), 0, 0,640,480);
-  image(kinect.depthImage(), 640, 0,640,480);  
 
   IntVector userList = new IntVector();
   kinect.getUsers(userList);
@@ -182,6 +190,35 @@ public void draw() {
       msg = con.yaw + ":" + con.roll + "\n";
     }
   }
+
+  //oculusrift\u3088\u3046\u306b\u6620\u50cf\u3092\u51e6\u7406
+  scene.beginDraw();
+  scene.background(0);
+  scene.image(receiveImage, 0, 0, 640, 800);
+  scene.image(kinect.depthImage(), 0, 800-(480/2), 640/2,480/2);
+  scene.translate(scene.width/2, scene.height/2, 100);
+  scene.endDraw();
+
+  blendMode(ADD);
+   // Render left eye
+  set_shader("left");
+  shader(barrel);
+  fb.beginDraw();
+  fb.background(0);
+  fb.image(scene, 50, 0, eye_width, eye_height);
+  fb.endDraw();
+  image(fb, 0, 0);
+  
+  resetShader();
+  
+  // Render right eye
+  set_shader("right");
+  shader(barrel);
+  fb.beginDraw();
+  fb.background(0);
+  fb.image(scene, eye_width-50, 0, eye_width, eye_height);
+  fb.endDraw();
+  image(fb, 0, 0);
 
 }
 
@@ -235,6 +272,46 @@ public void keyPressed() {
       chatServer.write(msg);//\u30b5\u30fc\u30d0\u30fc\u306b\u6570\u5b57\u3092\u9001\u308b
       msg="";
     }
+}
+
+public void set_shader(String eye)
+{
+  float x = 0.0f;
+  float y = 0.0f;
+  float w = 0.5f;
+  float h = 1.0f;
+  float DistortionXCenterOffset = 0.25f;
+  float as = w/h;
+
+  float K0 = 1.0f;
+  float K1 = 0.22f;
+  float K2 = 0.24f;
+  float K3 = 0.0f;
+
+  float scaleFactor = 0.7f;
+
+  if (eye == "left")
+  {
+    x = 0.0f;
+    y = 0.0f;
+    w = 0.5f;
+    h = 1.0f;
+    DistortionXCenterOffset = 0.25f;
+  }
+  else if (eye == "right")
+  {
+    x = 0.5f;
+    y = 0.0f;
+    w = 0.5f;
+    h = 1.0f;
+    DistortionXCenterOffset = -0.25f;
+  }
+
+  barrel.set("LensCenter", x + (w + DistortionXCenterOffset * 0.5f)*0.5f, y + h*0.5f);
+  barrel.set("ScreenCenter", x + w*0.5f, y + h*0.5f);
+  barrel.set("Scale", (w/2.0f) * scaleFactor, (h/2.0f) * scaleFactor * as);
+  barrel.set("ScaleIn", (2.0f/w), (2.0f/h) / as);
+  barrel.set("HmdWarpParam", K0, K1, K2, K3);
 }
 public  int count;
 
