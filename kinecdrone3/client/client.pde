@@ -12,6 +12,10 @@ import java.net.*;
 
 import java.*;
 
+import fullscreen.*; 
+
+FullScreen fs;
+
 SimpleOpenNI  kinect;
 
 PoseOperation pose;
@@ -35,8 +39,10 @@ byte[] receivedBytes = new byte[300000];
 void setup() {
   size(640*2, 800);
 
-  chatServer = new Server(this,2001);
+  fs = new FullScreen(this); 
+  fs.enter();
 
+  chatServer = new Server(this,2001);
 
   kinect = new SimpleOpenNI(this);
   kinect.enableDepth();
@@ -79,7 +85,7 @@ void draw() {
   } 
   Image awtImage = Toolkit.getDefaultToolkit().createImage(receivedBytes);
   PImage receiveImage = loadImageMT(awtImage);
-  //ARカメラ描画
+  ARカメラ描画
   image(receiveImage,640,0, 640, 800);
   image(receiveImage,0,0, 640, 800);
 
@@ -87,7 +93,8 @@ void draw() {
   textSize(50);  
   kinect.update();  
   image(kinect.depthImage(), 0, 800-(480/4),640/4,480/4);
-  image(kinect.depthImage(), 640, 800-(480/4),640/4,480/4);
+   // image(kinect.depthImage(), 640, 800-(480/4),640/4,480/4);
+
 
   IntVector userList = new IntVector();
   kinect.getUsers(userList);

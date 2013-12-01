@@ -13,6 +13,7 @@ import java.net.DatagramPacket;
 import java.net.DatagramSocket; 
 import java.net.*; 
 import java.*; 
+import fullscreen.*; 
 
 import org.slf4j.helpers.*; 
 import com.xuggle.xuggler.video.*; 
@@ -79,6 +80,10 @@ public class client extends PApplet {
 
 
 
+ 
+
+FullScreen fs;
+
 SimpleOpenNI  kinect;
 
 PoseOperation pose;
@@ -102,8 +107,10 @@ byte[] receivedBytes = new byte[300000];
 public void setup() {
   size(640*2, 800);
 
-  chatServer = new Server(this,2001);
+  fs = new FullScreen(this); 
+  fs.enter();
 
+  chatServer = new Server(this,2001);
 
   kinect = new SimpleOpenNI(this);
   kinect.enableDepth();
@@ -147,14 +154,17 @@ public void draw() {
   Image awtImage = Toolkit.getDefaultToolkit().createImage(receivedBytes);
   PImage receiveImage = loadImageMT(awtImage);
   //AR\u30ab\u30e1\u30e9\u63cf\u753b
-  image(receiveImage,640,0, 640, 800);
-  image(receiveImage,0,0, 640, 800);
+  // image(receiveImage,640,0, 640, 800);
+  // image(receiveImage,0,0, 640, 800);
 
   //kinect \u30d7\u30ed\u30b0\u30e9\u30e0
   textSize(50);  
   kinect.update();  
-  image(kinect.depthImage(), 0, 800-(480/4),640/4,480/4);
-  image(kinect.depthImage(), 640, 800-(480/4),640/4,480/4);
+  // image(kinect.depthImage(), 0, 800-(480/4),640/4,480/4);
+  // image(kinect.depthImage(), 640, 800-(480/4),640/4,480/4);
+  
+  image(kinect.depthImage(), 0, 0,640,480);
+  image(kinect.depthImage(), 640, 0,640,480);  
 
   IntVector userList = new IntVector();
   kinect.getUsers(userList);
