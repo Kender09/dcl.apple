@@ -124,7 +124,7 @@ void draw() {
     }
   }
 
-  //oculusriftように映像を処理
+  //oculusriftように映像を合成
   scene.beginDraw();
   scene.background(0);
   scene.image(receiveImage, 0, 0, 640, 800);
@@ -132,6 +132,7 @@ void draw() {
   scene.translate(scene.width/2, scene.height/2, 100);
   scene.endDraw();
 
+  //加工した画像を描画
   blendMode(ADD);
    // Render left eye
   set_shader("left");
