@@ -113,7 +113,7 @@ void draw() {
     int userId = userList.get(0);
     if( kinect.isTrackingSkeleton(userId) ){
       con = pose.posePressed(userId);
-      msg = con.yaw + ":" + con.roll + "\n";
+      msg = con.yaw + ":" + con.roll +  ":" + con.spin + "\n";
       println(msg);
       // drawSkeleton(userId);
       chatServer.write(msg);

@@ -65,9 +65,9 @@ void draw() {
     int [] yaw_roll = int(split(smsg, ":"));
 
     // ardrone操作の命令
-    println(yaw_roll[0] + " : " + yaw_roll[1]);
-    text(yaw_roll[0] + " : " + yaw_roll[1], 400,100);
-    ardrone.move3D(yaw_roll[0], yaw_roll[1], 0, 0);
+    println(yaw_roll[0] + " : " + yaw_roll[1] + " : " + yaw_roll[2]);
+    text(yaw_roll[0] + " : " + yaw_roll[1] + " : " + yaw_roll[2], 400,100);
+    ardrone.move3D(yaw_roll[0], yaw_roll[1], 0, yaw_roll[2]);
   }
 
    //バッファーイメージに変換

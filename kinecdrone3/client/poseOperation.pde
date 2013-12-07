@@ -3,6 +3,7 @@ public  int count;
 class ArDroneOrder{
   int yaw;
   int roll;
+  int spin;
 }
 
 class PoseOperation{
@@ -34,6 +35,7 @@ class PoseOperation{
   
   float playerRoll;
   float playerYaw;
+  float playerSpin;
 
   PoseOperation(SimpleOpenNI context){
     this.context = context;
@@ -67,6 +69,8 @@ class PoseOperation{
     playerRoll = leftHand.z - rightHand.z;
 
     playerYaw = (rightHand.y + leftHand.y)/2.0;
+
+    playerSpin = (rightHand.y - leftHand.y);
     
     if(playerYaw > head.y){
       playerYaw = playerYaw - head.y;
@@ -83,9 +87,10 @@ class PoseOperation{
 
     playerRoll = playerRoll/move_speed;
     playerYaw = playerYaw/(move_speed-10);
+    playerSpin = playerSpin/(move_speed-10);
 
     // println("playerRoll: " + playerRoll);
-    // println("playerYaw: " + playerYaw);
+    println("playerSpin: " + playerSpin);
 
     if(abs(playerRoll) < 5){
       playerRoll = 0;
@@ -117,21 +122,41 @@ class PoseOperation{
       }else if(playerYaw<0){
         text("back", 100,100);
         text("back", 700,100);
-          playerYaw  = playerYaw;
         if(playerYaw<-30){
           playerYaw = -30;
         }
       }
     }
 
-    if(playerYaw != 0 || playerRoll != 0){
+    if(abs(playerSpin) <5){
+      playerSpin = 0;
+    }else{
+      if(playerSpin>0){
+        text("spinL", 100,300);
+        text("spinL", 700,300);
+        if(playerSpin>30){
+          playerSpin = 30;
+        }
+      }else if(playerSpin<0){
+        text("spinR", 100,300);
+        text("spinR", 700,300);
+        if(playerSpin<-30){
+          playerSpin = -30;
+        }
+      }
+    }
+
+
+    if(playerYaw != 0 || playerRoll != 0 || playerSpin != 0){
       stroke(0,255,255);
       poseCon.yaw = (int)playerYaw;
       poseCon.roll = (int)playerRoll;
+      poseCon.spin = (int)playerSpin;
     }else{
       stroke(255,255,255);
       poseCon.yaw = 0;
       poseCon.roll = 0;
+      poseCon.spin = 0;
     } 
     return poseCon;
   }

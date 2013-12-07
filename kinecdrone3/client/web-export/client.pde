@@ -1,83 +1,16 @@
-import processing.core.*; 
-import processing.data.*; 
-import processing.event.*; 
-import processing.opengl.*; 
+import processing.net.*;
 
-import processing.net.*; 
-import SimpleOpenNI.*; 
-import processing.video.*; 
-import java.awt.image.*; 
-import java.awt.*; 
-import javax.imageio.*; 
-import java.net.DatagramPacket; 
-import java.net.DatagramSocket; 
-import java.net.*; 
-import java.*; 
+import SimpleOpenNI.*;
 
-import org.slf4j.helpers.*; 
-import com.xuggle.xuggler.video.*; 
-import org.apache.commons.net.chargen.*; 
-import org.apache.commons.net.bsd.*; 
-import org.apache.commons.net.discard.*; 
-import org.apache.commons.net.nntp.*; 
-import com.shigeodayo.ardrone.command.*; 
-import org.apache.commons.net.ftp.*; 
-import org.apache.commons.net.finger.*; 
-import org.apache.commons.net.ftp.parser.*; 
-import org.apache.commons.net.ntp.*; 
-import org.apache.commons.net.smtp.*; 
-import com.shigeodayo.ardrone.*; 
-import org.apache.commons.net.whois.*; 
-import com.xuggle.ferry.*; 
-import org.apache.commons.net.*; 
-import org.apache.commons.net.io.*; 
-import org.apache.commons.net.imap.*; 
-import com.xuggle.mediatool.event.*; 
-import com.xuggle.mediatool.demos.*; 
-import org.apache.commons.net.tftp.*; 
-import com.xuggle.xuggler.io.*; 
-import org.apache.commons.net.time.*; 
-import org.slf4j.impl.*; 
-import com.shigeodayo.ardrone.utils.*; 
-import org.apache.commons.net.echo.*; 
-import com.xuggle.xuggler.*; 
-import com.shigeodayo.ardrone.processing.*; 
-import com.shigeodayo.ardrone.video.*; 
-import org.slf4j.*; 
-import com.xuggle.mediatool.*; 
-import org.apache.commons.net.pop3.*; 
-import org.slf4j.spi.*; 
-import com.shigeodayo.ardrone.manager.*; 
-import org.apache.commons.net.telnet.*; 
-import com.shigeodayo.ardrone.navdata.*; 
-import org.apache.commons.net.util.*; 
-import com.xuggle.xuggler.demos.*; 
-import org.apache.commons.net.daytime.*; 
+import processing.video.*;
+import java.awt.image.*;
+import java.awt.*;
+import javax.imageio.*;
+import java.net.DatagramPacket;  
+import java.net.DatagramSocket;
+import java.net.*;
 
-import java.util.HashMap; 
-import java.util.ArrayList; 
-import java.io.File; 
-import java.io.BufferedReader; 
-import java.io.PrintWriter; 
-import java.io.InputStream; 
-import java.io.OutputStream; 
-import java.io.IOException; 
-
-public class client extends PApplet {
-
-
-
-
-
-
-
-
-
-  
-
-
-
-
+import java.*;
 
 // import fullscreen.*; 
 // FullScreen fs;
@@ -95,21 +28,24 @@ DatagramSocket receiveSocket;
 Server chatServer;
 Client cl;
 
+Server jsServer;
+Client jsClient;
+
 String msg;
 
 byte[] sendBytes;
-//\u53d7\u4fe1\u3059\u308b\u30d0\u30a4\u30c8\u914d\u5217\u3092\u683c\u7d0d\u3059\u308b\u7bb1
+//受信するバイト配列を格納する箱
 byte[] receivedBytes = new byte[300000];
  
 
-//oculur rift\u3088\u3046\u306b\u753b\u50cf\u5909\u63db
+//oculur riftように画像変換
 PShader barrel;
 PGraphics fb;
 PGraphics scene;
 int eye_width = 640;
 int eye_height = 800;
 
-public void setup() {
+void setup() {
   size(640*2, 800, P3D);
 
   // fs = new FullScreen(this); 
@@ -122,6 +58,7 @@ public void setup() {
   barrel = loadShader("barrel_frag.glsl");  
 
   chatServer = new Server(this,2001);
+  jsServer = new Server(this, 3001);
 
   kinect = new SimpleOpenNI(this);
   kinect.enableDepth();
@@ -132,43 +69,49 @@ public void setup() {
   con = new ArDroneOrder();
   con.yaw = 0;
   con.roll = 0;
-  // \u30c6\u30ad\u30b9\u30c8\u306e\u592a\u3055
+  // テキストの太さ
   strokeWeight(5);
 
-  // try {
-  //   //\u53d7\u4fe1\u30dd\u30fc\u30c8
-  //   receiveSocket = new DatagramSocket(5100);
-  // }
-  // catch(SocketException e) {
-  // }
-  // //\u53d7\u4fe1\u7528\u30d1\u30b1\u30c3\u30c8
-  // receivePacket = new DatagramPacket(receivedBytes,receivedBytes.length);
-  // try{
-  //   receiveSocket.setSoTimeout(1000);
-  // }catch(SocketException e){
-  // }
+  try {
+    //受信ポート
+    receiveSocket = new DatagramSocket(5100);
+  }
+  catch(SocketException e) {
+  }
+  //受信用パケット
+  receivePacket = new DatagramPacket(receivedBytes,receivedBytes.length);
+  try{
+    receiveSocket.setSoTimeout(1000);
+  }catch(SocketException e){
+  }
 }
 
 
-public void draw() {
+void draw() {
   background(0);
 
-    cl = chatServer.available();
+  cl = chatServer.available();
   if(cl !=null) println("connected");
 
-  //AR\u30ab\u30e1\u30e9\u6620\u50cf\u306e\u53d6\u5f97
-  // try {
-  //   receiveSocket.receive(receivePacket);
-  // }
-  // catch(IOException e) {
-  // } 
+  jsClient = jsServer.available();
+  if(jsClient != null){
+    String jsMessage = jsClient.readString();
+    println("receive: " + jsMessage);
+  }
+
+  //ARカメラ映像の取得
+  try {
+    receiveSocket.receive(receivePacket);
+  }
+  catch(IOException e) {
+  } 
   Image awtImage = Toolkit.getDefaultToolkit().createImage(receivedBytes);
   PImage receiveImage = loadImageMT(awtImage);
-  // AR\u30ab\u30e1\u30e9\u63cf\u753b
+  // ARカメラ描画
   // image(receiveImage,640,0, 640, 800);
   // image(receiveImage,0,0, 640, 800);
 
-  //kinect \u30d7\u30ed\u30b0\u30e9\u30e0
+  //kinect プログラム
   textSize(50);  
   kinect.update();  
   // image(kinect.depthImage(), 0, 800-(480/4),640/4,480/4);
@@ -180,10 +123,10 @@ public void draw() {
     int userId = userList.get(0);
     if( kinect.isTrackingSkeleton(userId) ){
       con = pose.posePressed(userId);
-      msg = con.yaw + ":" + con.roll +  ":" + con.spin + "\n";
+      msg = con.yaw + ":" + con.roll + "\n";
       println(msg);
       // drawSkeleton(userId);
-      // chatServer.write(msg);
+      chatServer.write(msg);
     }else{
       con.yaw = 0;
       con.roll = 0;
@@ -191,7 +134,7 @@ public void draw() {
     }
   }
 
-  //oculusrift\u3088\u3046\u306b\u6620\u50cf\u3092\u5408\u6210
+  //oculusriftように映像を合成
   scene.beginDraw();
   scene.background(0);
   scene.image(receiveImage, 0, 0, 640, 800);
@@ -199,7 +142,7 @@ public void draw() {
   scene.translate(scene.width/2, scene.height/2, 100);
   scene.endDraw();
 
-  //\u52a0\u5de5\u3057\u305f\u753b\u50cf\u3092\u63cf\u753b
+  //加工した画像を描画
   blendMode(ADD);
    // Render left eye
   set_shader("left");
@@ -223,7 +166,7 @@ public void draw() {
 
 }
 
-public void drawSkeleton(int userId) {
+void drawSkeleton(int userId) {
   kinect.drawLimb(userId, SimpleOpenNI.SKEL_HEAD, SimpleOpenNI.SKEL_NECK);
   kinect.drawLimb(userId, SimpleOpenNI.SKEL_NECK, SimpleOpenNI.SKEL_LEFT_SHOULDER);
   kinect.drawLimb(userId, SimpleOpenNI.SKEL_LEFT_SHOULDER, SimpleOpenNI.SKEL_LEFT_ELBOW);
@@ -243,12 +186,12 @@ public void drawSkeleton(int userId) {
 }
 
 // user-tracking callbacks!
-public void onNewUser(int userId) {
+void onNewUser(int userId) {
   println("start pose detection");
   kinect.startPoseDetection("Psi", userId);
 }
 
-public void onEndCalibration(int userId, boolean successful) {
+void onEndCalibration(int userId, boolean successful) {
   if (successful) { 
     println("  User calibrated !!!");
     kinect.startTrackingSkeleton(userId);
@@ -259,29 +202,29 @@ public void onEndCalibration(int userId, boolean successful) {
   }
 }
 
-public void onStartPose(String pose, int userId) {
+void onStartPose(String pose, int userId) {
   println("Started pose for user");
   kinect.stopPoseDetection(userId); 
   kinect.requestCalibrationSkeleton(userId, true);
 }
 
 
-public void keyPressed() {
+void keyPressed() {
     int dmy;
     msg = msg + key;
     if(key =='\n') {
-      chatServer.write(msg);//\u30b5\u30fc\u30d0\u30fc\u306b\u6570\u5b57\u3092\u9001\u308b
+      chatServer.write(msg);//サーバーに数字を送る
       msg="";
     }
 }
 
-public void set_shader(String eye)
+void set_shader(String eye)
 {
-  float x = 0.0f;
-  float y = 0.0f;
-  float w = 0.5f;
-  float h = 1.0f;
-  float DistortionXCenterOffset = 0.25f;
+  float x = 0.0;
+  float y = 0.0;
+  float w = 0.5;
+  float h = 1.0;
+  float DistortionXCenterOffset = 0.25;
   float as = w/h;
 
   float K0 = 1.0f;
@@ -319,7 +262,6 @@ public  int count;
 class ArDroneOrder{
   int yaw;
   int roll;
-  int spin;
 }
 
 class PoseOperation{
@@ -351,7 +293,6 @@ class PoseOperation{
   
   float playerRoll;
   float playerYaw;
-  float playerSpin;
 
   PoseOperation(SimpleOpenNI context){
     this.context = context;
@@ -360,7 +301,7 @@ class PoseOperation{
     textSize(50);
   }
 
-  public ArDroneOrder posePressed(int userId){
+  ArDroneOrder posePressed(int userId){
 
     context.getJointPositionSkeleton(userId, SimpleOpenNI.SKEL_RIGHT_HAND, rightHand);
     context.getJointPositionSkeleton(userId, SimpleOpenNI.SKEL_RIGHT_ELBOW, rightElbow);
@@ -384,14 +325,12 @@ class PoseOperation{
     
     playerRoll = leftHand.z - rightHand.z;
 
-    playerYaw = (rightHand.y + leftHand.y)/2.0f;
-
-    playerSpin = (rightHand.y - leftHand.y);
+    playerYaw = (rightHand.y + leftHand.y)/2.0;
     
     if(playerYaw > head.y){
       playerYaw = playerYaw - head.y;
-    }else if(playerYaw < (torso.y + baseScale/3.0f) ){
-      playerYaw = playerYaw - (torso.y + baseScale/3.0f);
+    }else if(playerYaw < (torso.y + baseScale/3.0) ){
+      playerYaw = playerYaw - (torso.y + baseScale/3.0);
     }else{
       playerYaw = 0;
     }
@@ -403,10 +342,9 @@ class PoseOperation{
 
     playerRoll = playerRoll/move_speed;
     playerYaw = playerYaw/(move_speed-10);
-    playerSpin = playerSpin/(move_speed-10);
 
     // println("playerRoll: " + playerRoll);
-    println("playerSpin: " + playerSpin);
+    // println("playerYaw: " + playerYaw);
 
     if(abs(playerRoll) < 5){
       playerRoll = 0;
@@ -438,51 +376,23 @@ class PoseOperation{
       }else if(playerYaw<0){
         text("back", 100,100);
         text("back", 700,100);
+          playerYaw  = playerYaw;
         if(playerYaw<-30){
           playerYaw = -30;
         }
       }
     }
 
-    if(abs(playerSpin) <5){
-      playerSpin = 0;
-    }else{
-      if(playerSpin>0){
-        text("spinL", 100,300);
-        text("spinL", 700,300);
-        if(playerSpin>30){
-          playerSpin = 30;
-        }
-      }else if(playerSpin<0){
-        text("spinR", 100,300);
-        text("spinR", 700,300);
-        if(playerSpin<-30){
-          playerSpin = -30;
-        }
-      }
-    }
-
-
-    if(playerYaw != 0 || playerRoll != 0 || playerSpin != 0){
+    if(playerYaw != 0 || playerRoll != 0){
       stroke(0,255,255);
       poseCon.yaw = (int)playerYaw;
       poseCon.roll = (int)playerRoll;
-      poseCon.spin = (int)playerSpin;
     }else{
       stroke(255,255,255);
       poseCon.yaw = 0;
       poseCon.roll = 0;
-      poseCon.spin = 0;
     } 
     return poseCon;
   }
 }
-  static public void main(String[] passedArgs) {
-    String[] appletArgs = new String[] { "client" };
-    if (passedArgs != null) {
-      PApplet.main(concat(appletArgs, passedArgs));
-    } else {
-      PApplet.main(appletArgs);
-    }
-  }
-}
+
