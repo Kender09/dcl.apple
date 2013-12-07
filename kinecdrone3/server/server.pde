@@ -67,7 +67,7 @@ void draw() {
     // ardrone操作の命令
     println(yaw_roll[0] + " : " + yaw_roll[1] + " : " + yaw_roll[2]);
     text(yaw_roll[0] + " : " + yaw_roll[1] + " : " + yaw_roll[2], 400,100);
-    ardrone.move3D(yaw_roll[0], yaw_roll[1], 0, yaw_roll[2]);
+    // ardrone.move3D(yaw_roll[0], yaw_roll[1], 0, yaw_roll[2]);  //AR.Droneに命令を送る
   }
 
    //バッファーイメージに変換

@@ -120,7 +120,7 @@ void draw() {
     }else{
       con.yaw = 0;
       con.roll = 0;
-      msg = con.yaw + ":" + con.roll + "\n";
+      msg = con.yaw + ":" + con.roll + ":" + con.spin + "\n";
     }
   }
 
@@ -217,7 +217,7 @@ void set_shader(String eye)
   float DistortionXCenterOffset = 0.25;
   float as = w/h;
 
-  float K0 = 1.0f;
+  float K0 = 1.5f;
   float K1 = 0.22f;
   float K2 = 0.24f;
   float K3 = 0.0f;

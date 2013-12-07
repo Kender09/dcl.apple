@@ -135,18 +135,18 @@ public void setup() {
   // \u30c6\u30ad\u30b9\u30c8\u306e\u592a\u3055
   strokeWeight(5);
 
-  // try {
-  //   //\u53d7\u4fe1\u30dd\u30fc\u30c8
-  //   receiveSocket = new DatagramSocket(5100);
-  // }
-  // catch(SocketException e) {
-  // }
-  // //\u53d7\u4fe1\u7528\u30d1\u30b1\u30c3\u30c8
-  // receivePacket = new DatagramPacket(receivedBytes,receivedBytes.length);
-  // try{
-  //   receiveSocket.setSoTimeout(1000);
-  // }catch(SocketException e){
-  // }
+  try {
+    //\u53d7\u4fe1\u30dd\u30fc\u30c8
+    receiveSocket = new DatagramSocket(5100);
+  }
+  catch(SocketException e) {
+  }
+  //\u53d7\u4fe1\u7528\u30d1\u30b1\u30c3\u30c8
+  receivePacket = new DatagramPacket(receivedBytes,receivedBytes.length);
+  try{
+    receiveSocket.setSoTimeout(1000);
+  }catch(SocketException e){
+  }
 }
 
 
@@ -157,11 +157,11 @@ public void draw() {
   if(cl !=null) println("connected");
 
   //AR\u30ab\u30e1\u30e9\u6620\u50cf\u306e\u53d6\u5f97
-  // try {
-  //   receiveSocket.receive(receivePacket);
-  // }
-  // catch(IOException e) {
-  // } 
+  try {
+    receiveSocket.receive(receivePacket);
+  }
+  catch(IOException e) {
+  } 
   Image awtImage = Toolkit.getDefaultToolkit().createImage(receivedBytes);
   PImage receiveImage = loadImageMT(awtImage);
   // AR\u30ab\u30e1\u30e9\u63cf\u753b
@@ -183,7 +183,7 @@ public void draw() {
       msg = con.yaw + ":" + con.roll +  ":" + con.spin + "\n";
       println(msg);
       // drawSkeleton(userId);
-      // chatServer.write(msg);
+      chatServer.write(msg);
     }else{
       con.yaw = 0;
       con.roll = 0;
@@ -284,7 +284,7 @@ public void set_shader(String eye)
   float DistortionXCenterOffset = 0.25f;
   float as = w/h;
 
-  float K0 = 1.0f;
+  float K0 = 1.5f;
   float K1 = 0.22f;
   float K2 = 0.24f;
   float K3 = 0.0f;
@@ -403,7 +403,7 @@ class PoseOperation{
 
     playerRoll = playerRoll/move_speed;
     playerYaw = playerYaw/(move_speed-10);
-    playerSpin = playerSpin/(move_speed-10);
+    playerSpin = playerSpin/(move_speed-5);
 
     // println("playerRoll: " + playerRoll);
     println("playerSpin: " + playerSpin);
@@ -462,18 +462,20 @@ class PoseOperation{
       }
     }
 
-
-    if(playerYaw != 0 || playerRoll != 0 || playerSpin != 0){
-      stroke(0,255,255);
-      poseCon.yaw = (int)playerYaw;
-      poseCon.roll = (int)playerRoll;
-      poseCon.spin = (int)playerSpin;
-    }else{
-      stroke(255,255,255);
+    if(playerSpin != 0){
       poseCon.yaw = 0;
       poseCon.roll = 0;
-      poseCon.spin = 0;
-    } 
+    }
+
+    poseCon.yaw = (int)playerYaw;
+    poseCon.roll = (int)playerRoll;
+    poseCon.spin = (int)playerSpin;
+
+    // if(playerYaw != 0 || playerRoll != 0 || playerSpin != 0){
+    //   stroke(0,255,255);
+    // }else{
+    //   stroke(255,255,255);
+    // } 
     return poseCon;
   }
 }

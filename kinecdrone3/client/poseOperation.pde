@@ -87,7 +87,7 @@ class PoseOperation{
 
     playerRoll = playerRoll/move_speed;
     playerYaw = playerYaw/(move_speed-10);
-    playerSpin = playerSpin/(move_speed-10);
+    playerSpin = playerSpin/(move_speed-5);
 
     // println("playerRoll: " + playerRoll);
     println("playerSpin: " + playerSpin);
@@ -146,18 +146,20 @@ class PoseOperation{
       }
     }
 
-
-    if(playerYaw != 0 || playerRoll != 0 || playerSpin != 0){
-      stroke(0,255,255);
-      poseCon.yaw = (int)playerYaw;
-      poseCon.roll = (int)playerRoll;
-      poseCon.spin = (int)playerSpin;
-    }else{
-      stroke(255,255,255);
+    if(playerSpin != 0){
       poseCon.yaw = 0;
       poseCon.roll = 0;
-      poseCon.spin = 0;
-    } 
+    }
+
+    poseCon.yaw = (int)playerYaw;
+    poseCon.roll = (int)playerRoll;
+    poseCon.spin = (int)playerSpin;
+
+    // if(playerYaw != 0 || playerRoll != 0 || playerSpin != 0){
+    //   stroke(0,255,255);
+    // }else{
+    //   stroke(255,255,255);
+    // } 
     return poseCon;
   }
 }
