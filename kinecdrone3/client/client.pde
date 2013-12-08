@@ -68,44 +68,41 @@ void setup() {
   con.yaw = 0;
   con.roll = 0;
 
-  try {
-    //受信ポート
-    receiveSocket = new DatagramSocket(5100);
-  }
-  catch(SocketException e) {
-  }
-  //受信用パケット
-  receivePacket = new DatagramPacket(receivedBytes,receivedBytes.length);
-  try{
-    receiveSocket.setSoTimeout(1000);
-  }catch(SocketException e){
-  }
+  frameRate(10);
+
+  // try {
+  //   //受信ポート
+  //   receiveSocket = new DatagramSocket(5100);
+  // }
+  // catch(SocketException e) {
+  // }
+  // //受信用パケット
+  // receivePacket = new DatagramPacket(receivedBytes,receivedBytes.length);
+  // try{
+  //   receiveSocket.setSoTimeout(1000);
+  // }catch(SocketException e){
+  // }
 }
 
 
 void draw() {
   background(0);
 
-    cl = chatServer.available();
-  if(cl !=null) println("connected");
+  //   cl = chatServer.available();
+  // if(cl !=null) println("connected");
 
-  //ARカメラ映像の取得
-  try {
-    receiveSocket.receive(receivePacket);
-  }
-  catch(IOException e) {
-  } 
+  // //ARカメラ映像の取得
+  // try {
+  //   receiveSocket.receive(receivePacket);
+  // }
+  // catch(IOException e) {
+  // } 
   Image awtImage = Toolkit.getDefaultToolkit().createImage(receivedBytes);
   PImage receiveImage = loadImageMT(awtImage);
-  // ARカメラ描画
-  // image(receiveImage,640,0, 640, 800);
-  // image(receiveImage,0,0, 640, 800);
 
   //kinect プログラム
   textSize(50);  
   kinect.update();  
-  // image(kinect.depthImage(), 0, 800-(480/4),640/4,480/4);
-  // image(kinect.depthImage(), 640, 800-(480/4),640/4,480/4);
 
   IntVector userList = new IntVector();
   kinect.getUsers(userList);
@@ -116,7 +113,6 @@ void draw() {
       con = pose.posePressed(userId);
       msg = con.yaw + ":" + con.roll +  ":" + con.spin + "\n";
       println(msg);
-      // drawSkeleton(userId);
       chatServer.write(msg);
     }else{
       drawKinectFlag = 1;
@@ -131,10 +127,12 @@ void draw() {
   scene.background(0);
   scene.image(receiveImage, 0, 0, 640, 800);
   if(drawKinectFlag == 1){
-    scene.image(kinect.depthImage(), 0, 800-(480*0.8), 640*0.8,480*0.8);
+    scene.image(kinect.depthImage(), 320-((640*0.8)/2), 400-((480*0.8)/2), 640*0.8,480*0.8);
   }else if(drawKinectFlag == 0){
-    scene.textSize(50);
-    scene.text(msg,50, 800-(480/2));
+    // scene.image(kinect.depthImage(), 0, 800-(480*0.8), 640*0.8,480*0.8);
+    scene.textSize(30);
+    scene.fill(250, 0, 0);
+    scene.text(msg,250, 500);
   }
   scene.translate(scene.width/2, scene.height/2, 100);
   scene.endDraw();

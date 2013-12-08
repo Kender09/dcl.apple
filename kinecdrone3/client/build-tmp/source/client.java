@@ -135,6 +135,8 @@ public void setup() {
   con.yaw = 0;
   con.roll = 0;
 
+  frameRate(10);
+
   // try {
   //   //\u53d7\u4fe1\u30dd\u30fc\u30c8
   //   receiveSocket = new DatagramSocket(5100);
@@ -164,15 +166,10 @@ public void draw() {
   // } 
   Image awtImage = Toolkit.getDefaultToolkit().createImage(receivedBytes);
   PImage receiveImage = loadImageMT(awtImage);
-  // AR\u30ab\u30e1\u30e9\u63cf\u753b
-  // image(receiveImage,640,0, 640, 800);
-  // image(receiveImage,0,0, 640, 800);
 
   //kinect \u30d7\u30ed\u30b0\u30e9\u30e0
   textSize(50);  
   kinect.update();  
-  // image(kinect.depthImage(), 0, 800-(480/4),640/4,480/4);
-  // image(kinect.depthImage(), 640, 800-(480/4),640/4,480/4);
 
   IntVector userList = new IntVector();
   kinect.getUsers(userList);
@@ -183,7 +180,6 @@ public void draw() {
       con = pose.posePressed(userId);
       msg = con.yaw + ":" + con.roll +  ":" + con.spin + "\n";
       println(msg);
-      // drawSkeleton(userId);
       chatServer.write(msg);
     }else{
       drawKinectFlag = 1;
@@ -198,11 +194,12 @@ public void draw() {
   scene.background(0);
   scene.image(receiveImage, 0, 0, 640, 800);
   if(drawKinectFlag == 1){
-    scene.image(kinect.depthImage(), 0, 800-(480*0.8f), 640*0.8f,480*0.8f);
+    scene.image(kinect.depthImage(), 320-((640*0.8f)/2), 400-((480*0.8f)/2), 640*0.8f,480*0.8f);
   }else if(drawKinectFlag == 0){
-    scene.strokeWeight(5);
-    scene.textSize(50);
-    scene.text(msg,50, 800-(480/2));
+    // scene.image(kinect.depthImage(), 0, 800-(480*0.8), 640*0.8,480*0.8);
+    scene.textSize(30);
+    scene.fill(250, 0, 0);
+    scene.text(msg,150, 500);
   }
   scene.translate(scene.width/2, scene.height/2, 100);
   scene.endDraw();
@@ -344,14 +341,15 @@ class PoseOperation{
   PVector neck = new PVector();
   PVector torso = new PVector();
   
-  PVector rightFoot = new PVector();
-  PVector rightKnee = new PVector();
-  PVector rightHip = new PVector();
-  PVector leftFoot = new PVector();
-  PVector leftKnee = new PVector();
-  PVector leftHip = new PVector();
+  // PVector rightFoot = new PVector();
+  // PVector rightKnee = new PVector();
+  // PVector rightHip = new PVector();
+  // PVector leftFoot = new PVector();
+  // PVector leftKnee = new PVector();
+  // PVector leftHip = new PVector();
   
   float baseScale;
+  float hhhead;
   int flag;
   int move_speed = 50;
 
@@ -392,23 +390,25 @@ class PoseOperation{
     context.getJointPositionSkeleton(userId, SimpleOpenNI.SKEL_NECK, neck);
     context.getJointPositionSkeleton(userId, SimpleOpenNI.SKEL_TORSO, torso);
 
-    context.getJointPositionSkeleton(userId, SimpleOpenNI.SKEL_RIGHT_FOOT, rightFoot);
-    context.getJointPositionSkeleton(userId, SimpleOpenNI.SKEL_RIGHT_KNEE, rightKnee);
-    context.getJointPositionSkeleton(userId, SimpleOpenNI.SKEL_RIGHT_HIP, rightHip);
-    context.getJointPositionSkeleton(userId, SimpleOpenNI.SKEL_LEFT_FOOT, leftFoot);
-    context.getJointPositionSkeleton(userId, SimpleOpenNI.SKEL_LEFT_KNEE, leftKnee);
-    context.getJointPositionSkeleton(userId, SimpleOpenNI.SKEL_LEFT_HIP, leftHip);  
+    // context.getJointPositionSkeleton(userId, SimpleOpenNI.SKEL_RIGHT_FOOT, rightFoot);
+    // context.getJointPositionSkeleton(userId, SimpleOpenNI.SKEL_RIGHT_KNEE, rightKnee);
+    // context.getJointPositionSkeleton(userId, SimpleOpenNI.SKEL_RIGHT_HIP, rightHip);
+    // context.getJointPositionSkeleton(userId, SimpleOpenNI.SKEL_LEFT_FOOT, leftFoot);
+    // context.getJointPositionSkeleton(userId, SimpleOpenNI.SKEL_LEFT_KNEE, leftKnee);
+    // context.getJointPositionSkeleton(userId, SimpleOpenNI.SKEL_LEFT_HIP, leftHip);  
 
     baseScale = head.y - torso.y;
     
+    hhhead = (head.y + neck.y)/2.0f;
+
     playerRoll = leftHand.z - rightHand.z;
 
     playerYaw = (rightHand.y + leftHand.y)/2.0f;
 
     playerSpin = (rightHand.y - leftHand.y);
     
-    if(playerYaw > head.y){
-      playerYaw = playerYaw - head.y;
+    if(playerYaw > hhhead){
+      playerYaw = playerYaw - hhhead;
     }else if(playerYaw < (torso.y + baseScale/3.0f) ){
       playerYaw = playerYaw - (torso.y + baseScale/3.0f);
     }else{
@@ -421,8 +421,8 @@ class PoseOperation{
     // println("playerYaw: " + playerYaw);
 
     playerYaw = playerYaw/(move_speed-20);
-    playerRoll = playerRoll/(move_speed-10);
-    playerSpin = playerSpin/(move_speed);
+    playerRoll = playerRoll/(move_speed-5);
+    playerSpin = playerSpin/(move_speed+10);
 
     // println("playerRoll: " + playerRoll);
     // println("playerSpin: " + playerSpin);

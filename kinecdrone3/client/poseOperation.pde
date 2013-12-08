@@ -20,14 +20,15 @@ class PoseOperation{
   PVector neck = new PVector();
   PVector torso = new PVector();
   
-  PVector rightFoot = new PVector();
-  PVector rightKnee = new PVector();
-  PVector rightHip = new PVector();
-  PVector leftFoot = new PVector();
-  PVector leftKnee = new PVector();
-  PVector leftHip = new PVector();
+  // PVector rightFoot = new PVector();
+  // PVector rightKnee = new PVector();
+  // PVector rightHip = new PVector();
+  // PVector leftFoot = new PVector();
+  // PVector leftKnee = new PVector();
+  // PVector leftHip = new PVector();
   
   float baseScale;
+  float hhhead;
   int flag;
   int move_speed = 50;
 
@@ -68,23 +69,25 @@ class PoseOperation{
     context.getJointPositionSkeleton(userId, SimpleOpenNI.SKEL_NECK, neck);
     context.getJointPositionSkeleton(userId, SimpleOpenNI.SKEL_TORSO, torso);
 
-    context.getJointPositionSkeleton(userId, SimpleOpenNI.SKEL_RIGHT_FOOT, rightFoot);
-    context.getJointPositionSkeleton(userId, SimpleOpenNI.SKEL_RIGHT_KNEE, rightKnee);
-    context.getJointPositionSkeleton(userId, SimpleOpenNI.SKEL_RIGHT_HIP, rightHip);
-    context.getJointPositionSkeleton(userId, SimpleOpenNI.SKEL_LEFT_FOOT, leftFoot);
-    context.getJointPositionSkeleton(userId, SimpleOpenNI.SKEL_LEFT_KNEE, leftKnee);
-    context.getJointPositionSkeleton(userId, SimpleOpenNI.SKEL_LEFT_HIP, leftHip);  
+    // context.getJointPositionSkeleton(userId, SimpleOpenNI.SKEL_RIGHT_FOOT, rightFoot);
+    // context.getJointPositionSkeleton(userId, SimpleOpenNI.SKEL_RIGHT_KNEE, rightKnee);
+    // context.getJointPositionSkeleton(userId, SimpleOpenNI.SKEL_RIGHT_HIP, rightHip);
+    // context.getJointPositionSkeleton(userId, SimpleOpenNI.SKEL_LEFT_FOOT, leftFoot);
+    // context.getJointPositionSkeleton(userId, SimpleOpenNI.SKEL_LEFT_KNEE, leftKnee);
+    // context.getJointPositionSkeleton(userId, SimpleOpenNI.SKEL_LEFT_HIP, leftHip);  
 
     baseScale = head.y - torso.y;
     
+    hhhead = (head.y + neck.y)/2.0;
+
     playerRoll = leftHand.z - rightHand.z;
 
     playerYaw = (rightHand.y + leftHand.y)/2.0;
 
     playerSpin = (rightHand.y - leftHand.y);
     
-    if(playerYaw > head.y){
-      playerYaw = playerYaw - head.y;
+    if(playerYaw > hhhead){
+      playerYaw = playerYaw - hhhead;
     }else if(playerYaw < (torso.y + baseScale/3.0) ){
       playerYaw = playerYaw - (torso.y + baseScale/3.0);
     }else{
@@ -96,9 +99,9 @@ class PoseOperation{
     // println("playerRoll: " + playerRoll);
     // println("playerYaw: " + playerYaw);
 
-    playerYaw = playerYaw/(move_speed-30);
-    playerRoll = playerRoll/(move_speed-10);
-    playerSpin = playerSpin/(move_speed);
+    playerYaw = playerYaw/(move_speed-20);
+    playerRoll = playerRoll/(move_speed-5);
+    playerSpin = playerSpin/(move_speed+10);
 
     // println("playerRoll: " + playerRoll);
     // println("playerSpin: " + playerSpin);
