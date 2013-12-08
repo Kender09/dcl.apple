@@ -27,7 +27,7 @@ String smsg;
 
 void setup() {
   size(640, 480);
-  String ip_addr = "192.168.10.38";
+  String ip_addr = "192.168.10.30";
 
   remoteAddress = new InetSocketAddress(ip_addr,5100);
 

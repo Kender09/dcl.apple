@@ -109,6 +109,8 @@ PGraphics scene;
 int eye_width = 640;
 int eye_height = 800;
 
+int drawKinectFlag = 1;
+
 public void setup() {
   size(640*2, 800, P3D);
 
@@ -132,36 +134,34 @@ public void setup() {
   con = new ArDroneOrder();
   con.yaw = 0;
   con.roll = 0;
-  // \u30c6\u30ad\u30b9\u30c8\u306e\u592a\u3055
-  strokeWeight(5);
 
-  try {
-    //\u53d7\u4fe1\u30dd\u30fc\u30c8
-    receiveSocket = new DatagramSocket(5100);
-  }
-  catch(SocketException e) {
-  }
-  //\u53d7\u4fe1\u7528\u30d1\u30b1\u30c3\u30c8
-  receivePacket = new DatagramPacket(receivedBytes,receivedBytes.length);
-  try{
-    receiveSocket.setSoTimeout(1000);
-  }catch(SocketException e){
-  }
+  // try {
+  //   //\u53d7\u4fe1\u30dd\u30fc\u30c8
+  //   receiveSocket = new DatagramSocket(5100);
+  // }
+  // catch(SocketException e) {
+  // }
+  // //\u53d7\u4fe1\u7528\u30d1\u30b1\u30c3\u30c8
+  // receivePacket = new DatagramPacket(receivedBytes,receivedBytes.length);
+  // try{
+  //   receiveSocket.setSoTimeout(1000);
+  // }catch(SocketException e){
+  // }
 }
 
 
 public void draw() {
   background(0);
 
-    cl = chatServer.available();
-  if(cl !=null) println("connected");
+  //   cl = chatServer.available();
+  // if(cl !=null) println("connected");
 
-  //AR\u30ab\u30e1\u30e9\u6620\u50cf\u306e\u53d6\u5f97
-  try {
-    receiveSocket.receive(receivePacket);
-  }
-  catch(IOException e) {
-  } 
+  // //AR\u30ab\u30e1\u30e9\u6620\u50cf\u306e\u53d6\u5f97
+  // try {
+  //   receiveSocket.receive(receivePacket);
+  // }
+  // catch(IOException e) {
+  // } 
   Image awtImage = Toolkit.getDefaultToolkit().createImage(receivedBytes);
   PImage receiveImage = loadImageMT(awtImage);
   // AR\u30ab\u30e1\u30e9\u63cf\u753b
@@ -179,15 +179,17 @@ public void draw() {
   if (userList.size() > 0) {
     int userId = userList.get(0);
     if( kinect.isTrackingSkeleton(userId) ){
+      drawKinectFlag = 0;
       con = pose.posePressed(userId);
       msg = con.yaw + ":" + con.roll +  ":" + con.spin + "\n";
       println(msg);
       // drawSkeleton(userId);
       chatServer.write(msg);
     }else{
+      drawKinectFlag = 1;
       con.yaw = 0;
       con.roll = 0;
-      msg = con.yaw + ":" + con.roll + "\n";
+      msg = con.yaw + ":" + con.roll + ":" + con.spin + "\n";
     }
   }
 
@@ -195,7 +197,13 @@ public void draw() {
   scene.beginDraw();
   scene.background(0);
   scene.image(receiveImage, 0, 0, 640, 800);
-  scene.image(kinect.depthImage(), 0, 800-(480/2), 640/2,480/2);
+  if(drawKinectFlag == 1){
+    scene.image(kinect.depthImage(), 0, 800-(480*0.8f), 640*0.8f,480*0.8f);
+  }else if(drawKinectFlag == 0){
+    scene.strokeWeight(5);
+    scene.textSize(50);
+    scene.text(msg,50, 800-(480/2));
+  }
   scene.translate(scene.width/2, scene.height/2, 100);
   scene.endDraw();
 
@@ -346,18 +354,29 @@ class PoseOperation{
   float baseScale;
   int flag;
   int move_speed = 50;
-  
+
   final int DelayTime = 10;
   
   float playerRoll;
   float playerYaw;
   float playerSpin;
 
+  float[] ave_playerRoll = new float[5];
+  float[] ave_playerYaw = new float[5];
+  float[] ave_playerSpin = new float[5];
+
+  int ave_count;
+
   PoseOperation(SimpleOpenNI context){
     this.context = context;
     count = 0;
     flag = 0;
-    textSize(50);
+    ave_count = 0;
+    for(int i = 0; i<5; i++){
+      ave_playerRoll[i] = 0;
+      ave_playerYaw[i] = 0;
+      ave_playerSpin[i] = 0;
+    }
   }
 
   public ArDroneOrder posePressed(int userId){
@@ -401,25 +420,64 @@ class PoseOperation{
     // println("playerRoll: " + playerRoll);
     // println("playerYaw: " + playerYaw);
 
-    playerRoll = playerRoll/move_speed;
-    playerYaw = playerYaw/(move_speed-10);
-    playerSpin = playerSpin/(move_speed-5);
+    playerYaw = playerYaw/(move_speed-20);
+    playerRoll = playerRoll/(move_speed-10);
+    playerSpin = playerSpin/(move_speed);
 
     // println("playerRoll: " + playerRoll);
-    println("playerSpin: " + playerSpin);
+    // println("playerSpin: " + playerSpin);
+    ave_playerRoll[ave_count] = playerRoll;
+    ave_playerYaw[ave_count] = playerYaw;
+    ave_playerSpin[ave_count] = playerSpin;
+    ave_count = (ave_count+1)%5;
+
+    float ave = 0;
+    float subave = 0;
+    int c;
+    for(c = 0; c < 5; c++){
+      ave = ave + ave_playerRoll[c];
+    }
+    ave = ave/5.0f;
+    subave = ave - playerRoll;
+    if(abs(subave) > 5){
+      playerRoll = ave;
+    }
+    ave = 0;
+
+    for(c = 0; c < 5; c++){
+      ave = ave + ave_playerYaw[c];
+    }
+    ave = ave/5.0f;
+    subave = ave - playerYaw;
+    if(abs(subave) > 5){
+      playerYaw = ave;
+    }
+    ave = 0;
+
+    for(c = 0; c < 5; c++){
+      ave = ave + ave_playerSpin[c];
+    }
+    ave = ave/5.0f;
+    subave = ave - playerSpin;
+    if(abs(subave) > 5){
+      playerSpin = ave;
+    }
+    ave = 0;
+
+
 
     if(abs(playerRoll) < 5){
       playerRoll = 0;
     }else{
       if(playerRoll>0){
-        text("left", 100,200);
-        text("left", 700,200);
+        // text("left", 100,200);
+        // text("left", 700,200);
         if(playerRoll > 30){
           playerRoll = 30;
         }
       }else if(playerRoll<0){
-        text("right", 100,200);
-        text("right", 700,200);
+        // text("right", 100,200);
+        // text("right", 700,200);
         if(playerRoll < -30){
           playerRoll = -30;
         }
@@ -430,32 +488,32 @@ class PoseOperation{
       playerYaw = 0;
     }else{
       if(playerYaw>0){
-        text("forward", 100,100);
-        text("forward", 700,100);
+        // text("forward", 100,100);
+        // text("forward", 700,100);
         if(playerYaw>30){
           playerYaw = 30;
         }
       }else if(playerYaw<0){
-        text("back", 100,100);
-        text("back", 700,100);
+        // text("back", 100,100);
+        // text("back", 700,100);
         if(playerYaw<-30){
           playerYaw = -30;
         }
       }
     }
 
-    if(abs(playerSpin) <5){
+    if(abs(playerSpin) <10){
       playerSpin = 0;
     }else{
       if(playerSpin>0){
-        text("spinL", 100,300);
-        text("spinL", 700,300);
+        // text("spinL", 100,300);
+        // text("spinL", 700,300);
         if(playerSpin>30){
           playerSpin = 30;
         }
       }else if(playerSpin<0){
-        text("spinR", 100,300);
-        text("spinR", 700,300);
+        // text("spinR", 100,300);
+        // text("spinR", 700,300);
         if(playerSpin<-30){
           playerSpin = -30;
         }
@@ -463,9 +521,10 @@ class PoseOperation{
     }
 
     if(playerSpin != 0){
-      poseCon.yaw = 0;
-      poseCon.roll = 0;
+      playerYaw = 0;
+      playerRoll = 0;
     }
+
 
     poseCon.yaw = (int)playerYaw;
     poseCon.roll = (int)playerRoll;

@@ -93,7 +93,7 @@ String smsg;
 
 public void setup() {
   size(640, 480);
-  String ip_addr = "localhost";
+  String ip_addr = "192.168.10.30";
 
   remoteAddress = new InetSocketAddress(ip_addr,5100);
 
@@ -110,16 +110,18 @@ public void setup() {
   //start the connections.
   ardrone.start();
 
+  textSize(50);  
+
 }
 
 
 public void draw() {
-  background(204);  
+  background(0);  
   PImage img = ardrone.getVideoImage(false);
   if (img == null){
     return;
   }else{
-  // image(img, 0, 0,640,480);
+    // image(img, 0, 0,640,480);
   }
   // capture.read();
   if(chatClient.available()>0){
@@ -129,8 +131,9 @@ public void draw() {
     int [] yaw_roll = PApplet.parseInt(split(smsg, ":"));
 
     // ardrone\u64cd\u4f5c\u306e\u547d\u4ee4
-    println(yaw_roll[0] + " : " + yaw_roll[1]);
-    // ardrone.move3D(yaw_roll[0], yaw_roll[1], 0, 0);
+    println(yaw_roll[0] + " : " + yaw_roll[1] + " : " + yaw_roll[2]);
+    text(yaw_roll[0] + " : " + yaw_roll[1] + " : " + yaw_roll[2], 400,100);
+    // ardrone.move3D(yaw_roll[0], yaw_roll[1], 0, yaw_roll[2]);  //AR.Drone\u306b\u547d\u4ee4\u3092\u9001\u308b
   }
 
    //\u30d0\u30c3\u30d5\u30a1\u30fc\u30a4\u30e1\u30fc\u30b8\u306b\u5909\u63db
@@ -158,7 +161,7 @@ public void draw() {
   }
   catch(SocketException e) {
   }
-  image(img, 0, 0,640,480);
+  // image(img, 0, 0,640,480);
 }
 
 public BufferedImage PImage2BImage(PImage pImg) {  
@@ -183,9 +186,9 @@ public void keyPressed() {
     else if (keyCode == LEFT)  ardrone.move3D(0, 10, 0, 0);//go left
     else if (keyCode == RIGHT) ardrone.move3D(0, -10, 0, 0);//go right
     else if (keyCode == SHIFT){
-      // ardrone.takeOff();//take off
-      // println("takeOff");
-      // text("takeOff", 100,100);
+      ardrone.takeOff();//take off
+      println("takeOff");
+      text("takeOff", 100,100);
     }
     else if (keyCode == CONTROL) {
       ardrone.landing();//land

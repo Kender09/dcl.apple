@@ -42,6 +42,8 @@ PGraphics scene;
 int eye_width = 640;
 int eye_height = 800;
 
+int drawKinectFlag = 1;
+
 void setup() {
   size(640*2, 800, P3D);
 
@@ -65,8 +67,6 @@ void setup() {
   con = new ArDroneOrder();
   con.yaw = 0;
   con.roll = 0;
-  // テキストの太さ
-  strokeWeight(5);
 
   try {
     //受信ポート
@@ -112,12 +112,14 @@ void draw() {
   if (userList.size() > 0) {
     int userId = userList.get(0);
     if( kinect.isTrackingSkeleton(userId) ){
+      drawKinectFlag = 0;
       con = pose.posePressed(userId);
       msg = con.yaw + ":" + con.roll +  ":" + con.spin + "\n";
       println(msg);
       // drawSkeleton(userId);
       chatServer.write(msg);
     }else{
+      drawKinectFlag = 1;
       con.yaw = 0;
       con.roll = 0;
       msg = con.yaw + ":" + con.roll + ":" + con.spin + "\n";
@@ -128,7 +130,12 @@ void draw() {
   scene.beginDraw();
   scene.background(0);
   scene.image(receiveImage, 0, 0, 640, 800);
-  scene.image(kinect.depthImage(), 0, 800-(480/2), 640/2,480/2);
+  if(drawKinectFlag == 1){
+    scene.image(kinect.depthImage(), 0, 800-(480*0.8), 640*0.8,480*0.8);
+  }else if(drawKinectFlag == 0){
+    scene.textSize(50);
+    scene.text(msg,50, 800-(480/2));
+  }
   scene.translate(scene.width/2, scene.height/2, 100);
   scene.endDraw();
 
