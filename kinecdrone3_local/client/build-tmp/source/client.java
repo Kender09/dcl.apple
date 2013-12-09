@@ -173,9 +173,9 @@ public void draw() {
     scene.image(kinect.depthImage(), 320-((640*0.8f)/2), 400-((480*0.8f)/2), 640*0.8f,480*0.8f);
   }else if(drawKinectFlag == 0){
     // scene.image(kinect.depthImage(), 0, 800-(480*0.8), 640*0.8,480*0.8);
-    scene.textSize(50);
+    scene.textSize(30);
     scene.fill(250, 0, 0);
-    scene.text(msg,50, 500);
+    scene.text(msg,150, 500);
   }
   scene.translate(scene.width/2, scene.height/2, 100);
   scene.endDraw();

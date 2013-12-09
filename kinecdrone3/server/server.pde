@@ -144,6 +144,10 @@ void keyPressed() {
   }
 }
 
+void keyReleased() {
+  ardrone.stop();
+}
+
 void exit() {
   //ここに終了処理
   ardrone.stop();
