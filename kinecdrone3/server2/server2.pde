@@ -27,6 +27,8 @@ String smsg;
 
 int startFlag = 0;
 
+Thread cthread;
+
 void setup() {
   size(640, 480);
   String ip_addr = "192.168.10.30";
@@ -49,7 +51,7 @@ void setup() {
   textSize(50);  
 
   ardroneMoveThread movethread = new ardroneMoveThread();
-  Thread cthread = new Thread(movethread);
+  cthread = new Thread(movethread);
 
   cthread.start();
 
@@ -105,6 +107,7 @@ BufferedImage PImage2BImage(PImage pImg) {
 void keyPressed() {
    if (key == 'e') {
       noLoop(); 
+      cthread.stop();
       exit(); //end proglam
     }
 

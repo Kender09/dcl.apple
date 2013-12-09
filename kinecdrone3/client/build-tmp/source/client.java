@@ -79,9 +79,6 @@ public class client extends PApplet {
 
 
 
-// import fullscreen.*; 
-// FullScreen fs;
-
 SimpleOpenNI  kinect;
 
 PoseOperation pose;
@@ -101,7 +98,6 @@ byte[] sendBytes;
 //\u53d7\u4fe1\u3059\u308b\u30d0\u30a4\u30c8\u914d\u5217\u3092\u683c\u7d0d\u3059\u308b\u7bb1
 byte[] receivedBytes = new byte[300000];
  
-
 //oculur rift\u3088\u3046\u306b\u753b\u50cf\u5909\u63db
 PShader barrel;
 PGraphics fb;
@@ -113,9 +109,6 @@ int drawKinectFlag = 1;
 
 public void setup() {
   size(640*2, 800, P3D);
-
-  // fs = new FullScreen(this); 
-  // fs.enter();
 
   fb = createGraphics(width, height, P3D);
   // Create PGraphics for actual scene

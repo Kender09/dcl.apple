@@ -62,7 +62,7 @@ import java.io.InputStream;
 import java.io.OutputStream; 
 import java.io.IOException; 
 
-public class server extends PApplet {
+public class server2 extends PApplet {
 
 
 
@@ -91,6 +91,10 @@ Client chatClient;
 float Val;
 String smsg;
 
+int startFlag = 0;
+
+Thread cthread;
+
 public void setup() {
   size(640, 480);
   String ip_addr = "192.168.10.30";
@@ -112,6 +116,11 @@ public void setup() {
 
   textSize(50);  
 
+  ardroneMoveThread movethread = new ardroneMoveThread();
+  cthread = new Thread(movethread);
+
+  cthread.start();
+
 }
 
 
@@ -119,24 +128,13 @@ public void draw() {
   background(0);  
   PImage img = ardrone.getVideoImage(false);
   if (img == null){
+    startFlag = 0;
     return;
   }else{
-    // image(img, 0, 0,640,480);
+    startFlag = 1;
+    image(img, 0, 0,640,480);
   }
-  // capture.read();
-  if(chatClient.available()>0){
-    smsg=chatClient.readStringUntil('\n');
-    // println(smsg);
-    // \u6587\u5b57\u5217\u304b\u3089yaw,roll\u306e\u6570\u5024\u3092\u53d6\u5f97
-    int [] yaw_roll = PApplet.parseInt(split(smsg, ":"));
-
-    // ardrone\u64cd\u4f5c\u306e\u547d\u4ee4
-    println(yaw_roll[0] + " : " + yaw_roll[1] + " : " + yaw_roll[2]);
-    text(yaw_roll[0] + " : " + yaw_roll[1] + " : " + yaw_roll[2], 400,100);
-    // ardrone.move3D(yaw_roll[0], yaw_roll[1], 0, yaw_roll[2]);  //AR.Drone\u306b\u547d\u4ee4\u3092\u9001\u308b
-  }
-
-   //\u30d0\u30c3\u30d5\u30a1\u30fc\u30a4\u30e1\u30fc\u30b8\u306b\u5909\u63db
+  //\u30d0\u30c3\u30d5\u30a1\u30fc\u30a4\u30e1\u30fc\u30b8\u306b\u5909\u63db
   BufferedImage bfImage = PImage2BImage(img);
   //\u30b9\u30c8\u30ea\u30fc\u30e0\u306e\u6e96\u5099
   ByteArrayOutputStream bos = new ByteArrayOutputStream();
@@ -157,11 +155,9 @@ public void draw() {
       new DatagramSocket().send(sendPacket);
     } catch(IOException e){
     }
-    // println("bufferImageSended:"+sendBytes.length+" bytes #2");
   }
   catch(SocketException e) {
   }
-  // image(img, 0, 0,640,480);
 }
 
 public BufferedImage PImage2BImage(PImage pImg) {  
@@ -177,6 +173,7 @@ public BufferedImage PImage2BImage(PImage pImg) {
 public void keyPressed() {
    if (key == 'e') {
       noLoop(); 
+      cthread.stop();
       exit(); //end proglam
     }
 
@@ -210,6 +207,10 @@ public void keyPressed() {
   }
 }
 
+public void keyReleased() {
+  ardrone.stop();
+}
+
 public void exit() {
   //\u3053\u3053\u306b\u7d42\u4e86\u51e6\u7406
   ardrone.stop();
@@ -217,8 +218,29 @@ public void exit() {
   println("exit");
   super.exit();
 }
+
+public class ardroneMoveThread implements Runnable{
+  public void run() {
+    while (true){
+      if(startFlag != 1){
+        continue;
+      }
+      if(chatClient.available()>0){
+        smsg=chatClient.readStringUntil('\n');
+        // println(smsg);
+        // \u6587\u5b57\u5217\u304b\u3089yaw,roll\u306e\u6570\u5024\u3092\u53d6\u5f97
+        int [] yaw_roll = PApplet.parseInt(split(smsg, ":"));
+        // ardrone\u64cd\u4f5c\u306e\u547d\u4ee4
+        println(yaw_roll[0] + " : " + yaw_roll[1] + " : " + yaw_roll[2]);
+        text(yaw_roll[0] + " : " + yaw_roll[1] + " : " + yaw_roll[2], 400,100);
+        ardrone.move3D(yaw_roll[0], yaw_roll[1], 0, yaw_roll[2]);  //AR.Drone\u306b\u547d\u4ee4\u3092\u9001\u308b
+      }
+
+    }
+  }
+}
   static public void main(String[] passedArgs) {
-    String[] appletArgs = new String[] { "server" };
+    String[] appletArgs = new String[] { "server2" };
     if (passedArgs != null) {
       PApplet.main(concat(appletArgs, passedArgs));
     } else {

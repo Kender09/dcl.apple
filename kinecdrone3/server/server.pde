@@ -55,9 +55,8 @@ void draw() {
   if (img == null){
     return;
   }else{
-    // image(img, 0, 0,640,480);
+    image(img, 0, 0,640,480);
   }
-  // capture.read();
   if(chatClient.available()>0){
     smsg=chatClient.readStringUntil('\n');
     // println(smsg);
@@ -67,7 +66,7 @@ void draw() {
     // ardrone操作の命令
     println(yaw_roll[0] + " : " + yaw_roll[1] + " : " + yaw_roll[2]);
     text(yaw_roll[0] + " : " + yaw_roll[1] + " : " + yaw_roll[2], 400,100);
-    // ardrone.move3D(yaw_roll[0], yaw_roll[1], 0, yaw_roll[2]);  //AR.Droneに命令を送る
+    ardrone.move3D(yaw_roll[0], yaw_roll[1], 0, yaw_roll[2]);  //AR.Droneに命令を送る
   }
 
    //バッファーイメージに変換
@@ -95,7 +94,6 @@ void draw() {
   }
   catch(SocketException e) {
   }
-  // image(img, 0, 0,640,480);
 }
 
 BufferedImage PImage2BImage(PImage pImg) {  

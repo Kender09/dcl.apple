@@ -12,9 +12,6 @@ import java.net.*;
 
 import java.*;
 
-// import fullscreen.*; 
-// FullScreen fs;
-
 SimpleOpenNI  kinect;
 
 PoseOperation pose;
@@ -34,7 +31,6 @@ byte[] sendBytes;
 //受信するバイト配列を格納する箱
 byte[] receivedBytes = new byte[300000];
  
-
 //oculur riftように画像変換
 PShader barrel;
 PGraphics fb;
@@ -46,9 +42,6 @@ int drawKinectFlag = 1;
 
 void setup() {
   size(640*2, 800, P3D);
-
-  // fs = new FullScreen(this); 
-  // fs.enter();
 
   fb = createGraphics(width, height, P3D);
   // Create PGraphics for actual scene
