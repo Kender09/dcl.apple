@@ -37,20 +37,19 @@ PImage testImg;
 
 void setup() {
   size(640, 480);
-  // ip_addr = "192.168.10.30";
 
   chatServer = new Server(this,2001);
 
   testImg = loadImage("buzz.jpg");
 
-  // ardrone = new ARDroneForP5("192.168.1.1");
-  // ardrone.connect();  
-  // //connect to the sensor info.
-  // ardrone.connectNav();
-  // //connect to the image info.
-  // ardrone.connectVideo();
-  // //start the connections.
-  // ardrone.start();
+  ardrone = new ARDroneForP5("192.168.1.1");
+  ardrone.connect();  
+  //connect to the sensor info.
+  ardrone.connectNav();
+  //connect to the image info.
+  ardrone.connectVideo();
+  //start the connections.
+  ardrone.start();
 
   textSize(50);  
 }
@@ -58,8 +57,8 @@ void setup() {
 
 void draw() {
   background(0);  
-  // PImage img = ardrone.getVideoImage(false);
-  PImage img = testImg;
+  PImage img = ardrone.getVideoImage(false);
+  // PImage img = testImg;
   if (img == null){
     startFlag = 0;
     return;
@@ -73,21 +72,19 @@ void draw() {
     if(chatServer.available() != null){
       chatClient = chatServer.available();
       testS=chatClient.readStringUntil('\n');
-      // ardroneMoveThread movethread = new ardroneMoveThread();
-      // cthread = new Thread(movethread);
-      // cthread.start();
+      ardroneMoveThread movethread = new ardroneMoveThread();
+      cthread = new Thread(movethread);
+      cthread.start();
       ip_addr = chatClient.ip();
       remoteAddress = new InetSocketAddress(ip_addr,5100);
-      text(ip_addr + testS,100,100);
+      println(ip_addr + testS);
       flag1 = 1;
     }else{
       return;
     }
   }
-  
-  chatClient = chatServer.available();
-  testS=chatClient.readStringUntil('\n');
-  text(ip_addr + testS,100,100);
+  fill(250, 0, 0);
+  text(ip_addr,100,100);
 
   //バッファーイメージに変換
   BufferedImage bfImage = PImage2BImage(img);
@@ -102,6 +99,7 @@ void draw() {
     os.close();
   }
   catch(IOException e) {
+    text("error0",100,150);
   }
   sendBytes = bos.toByteArray();
   try {
@@ -109,9 +107,11 @@ void draw() {
     try{
       new DatagramSocket().send(sendPacket);
     } catch(IOException e){
+      text("error1",100,200);
     }
   }
   catch(SocketException e) {
+    text("error2",100,300);
   }
 }
 

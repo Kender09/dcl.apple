@@ -129,7 +129,7 @@ public void setup() {
   con.roll = 0;
 
   frameRate(10);
-
+  textSize(50);
 }
 
 
@@ -146,11 +146,18 @@ public void draw() {
   if(flag2 == 0){
     cl =  new Client(this, ip_addr, 2001);
 
+    flag2 = 1;
+    for(int ggg = 0 ;ggg<1000; ggg++){
+      cl.write("test\n");
+      text(ip_addr,100,100);
+    }
+
     try {
     //\u53d7\u4fe1\u30dd\u30fc\u30c8
       receiveSocket = new DatagramSocket(5100);
     }
       catch(SocketException e) {
+
     }
     //\u53d7\u4fe1\u7528\u30d1\u30b1\u30c3\u30c8
       receivePacket = new DatagramPacket(receivedBytes,receivedBytes.length);
@@ -158,7 +165,7 @@ public void draw() {
         receiveSocket.setSoTimeout(1000);
       }catch(SocketException e){
     }
-    flag2 = 1;
+    return;
   }
 
   //AR\u30ab\u30e1\u30e9\u6620\u50cf\u306e\u53d6\u5f97
@@ -166,12 +173,12 @@ public void draw() {
     receiveSocket.receive(receivePacket);
   }
   catch(IOException e) {
+    text("miss",100,100);
   } 
   Image awtImage = Toolkit.getDefaultToolkit().createImage(receivedBytes);
   PImage receiveImage = loadImageMT(awtImage);
 
   //kinect \u30d7\u30ed\u30b0\u30e9\u30e0
-  textSize(50);  
   kinect.update();  
 
   IntVector userList = new IntVector();
@@ -197,7 +204,7 @@ public void draw() {
   scene.background(0);
   scene.image(receiveImage, 0, 0, 640, 800);
   if(drawKinectFlag == 1){
-    scene.image(kinect.depthImage(), 320-((640*0.8f)/2), 400-((480*0.8f)/2), 640*0.8f,480*0.8f);
+    // scene.image(kinect.depthImage(), 320-((640*0.8)/2), 400-((480*0.8)/2), 640*0.8,480*0.8);
   }else if(drawKinectFlag == 0){
     // scene.image(kinect.depthImage(), 0, 800-(480*0.8), 640*0.8,480*0.8);
     scene.textSize(30);

@@ -62,7 +62,7 @@ void setup() {
   con.roll = 0;
 
   frameRate(10);
-
+  textSize(50);
 }
 
 
@@ -79,11 +79,18 @@ void draw() {
   if(flag2 == 0){
     cl =  new Client(this, ip_addr, 2001);
 
+    flag2 = 1;
+    for(int ggg = 0 ;ggg<1000; ggg++){
+      cl.write("test\n");
+      text(ip_addr,100,100);
+    }
+
     try {
     //受信ポート
       receiveSocket = new DatagramSocket(5100);
     }
       catch(SocketException e) {
+
     }
     //受信用パケット
       receivePacket = new DatagramPacket(receivedBytes,receivedBytes.length);
@@ -91,7 +98,7 @@ void draw() {
         receiveSocket.setSoTimeout(1000);
       }catch(SocketException e){
     }
-    flag2 = 1;
+    return;
   }
 
   //ARカメラ映像の取得
@@ -99,12 +106,12 @@ void draw() {
     receiveSocket.receive(receivePacket);
   }
   catch(IOException e) {
+    text("miss",100,100);
   } 
   Image awtImage = Toolkit.getDefaultToolkit().createImage(receivedBytes);
   PImage receiveImage = loadImageMT(awtImage);
 
   //kinect プログラム
-  textSize(50);  
   kinect.update();  
 
   IntVector userList = new IntVector();
@@ -130,7 +137,7 @@ void draw() {
   scene.background(0);
   scene.image(receiveImage, 0, 0, 640, 800);
   if(drawKinectFlag == 1){
-    scene.image(kinect.depthImage(), 320-((640*0.8)/2), 400-((480*0.8)/2), 640*0.8,480*0.8);
+    // scene.image(kinect.depthImage(), 320-((640*0.8)/2), 400-((480*0.8)/2), 640*0.8,480*0.8);
   }else if(drawKinectFlag == 0){
     // scene.image(kinect.depthImage(), 0, 800-(480*0.8), 640*0.8,480*0.8);
     scene.textSize(30);

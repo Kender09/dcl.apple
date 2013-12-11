@@ -143,18 +143,17 @@ public void draw() {
       // cthread = new Thread(movethread);
       // cthread.start();
       ip_addr = chatClient.ip();
-      remoteAddress = new InetSocketAddress(ip_addr,5100);
-      text(ip_addr + testS,100,100);
+      // remoteAddress = new InetSocketAddress(ip_addr,5100);
+      println(ip_addr + testS);
       flag1 = 1;
     }else{
       return;
     }
   }
-  
-  chatClient = chatServer.available();
-  testS=chatClient.readStringUntil('\n');
-  text(ip_addr + testS,100,100);
+  fill(250, 0, 0);
+  text(ip_addr,100,100);
 
+  remoteAddress = new InetSocketAddress(ip_addr,5100);
   //\u30d0\u30c3\u30d5\u30a1\u30fc\u30a4\u30e1\u30fc\u30b8\u306b\u5909\u63db
   BufferedImage bfImage = PImage2BImage(img);
   //\u30b9\u30c8\u30ea\u30fc\u30e0\u306e\u6e96\u5099
@@ -168,6 +167,7 @@ public void draw() {
     os.close();
   }
   catch(IOException e) {
+    text("error0",100,150);
   }
   sendBytes = bos.toByteArray();
   try {
@@ -175,9 +175,11 @@ public void draw() {
     try{
       new DatagramSocket().send(sendPacket);
     } catch(IOException e){
+      text("error1",100,200);
     }
   }
   catch(SocketException e) {
+    text("error2",100,300);
   }
 }
 
