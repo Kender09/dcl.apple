@@ -27,7 +27,7 @@ String smsg;
 
 void setup() {
   size(640, 480);
-  String ip_addr = "192.168.10.38";
+  String ip_addr = "192.168.10.30";
 
   remoteAddress = new InetSocketAddress(ip_addr,5100);
 
@@ -44,18 +44,19 @@ void setup() {
   //start the connections.
   ardrone.start();
 
+  textSize(50);  
+
 }
 
 
 void draw() {
-  background(204);  
+  background(0);  
   PImage img = ardrone.getVideoImage(false);
   if (img == null){
     return;
   }else{
-  // image(img, 0, 0,640,480);
+    image(img, 0, 0,640,480);
   }
-  // capture.read();
   if(chatClient.available()>0){
     smsg=chatClient.readStringUntil('\n');
     // println(smsg);
@@ -63,8 +64,9 @@ void draw() {
     int [] yaw_roll = int(split(smsg, ":"));
 
     // ardrone操作の命令
-    println(yaw_roll[0] + " : " + yaw_roll[1]);
-    ardrone.move3D(yaw_roll[0], yaw_roll[1], 0, 0);
+    println(yaw_roll[0] + " : " + yaw_roll[1] + " : " + yaw_roll[2]);
+    text(yaw_roll[0] + " : " + yaw_roll[1] + " : " + yaw_roll[2], 400,100);
+    ardrone.move3D(yaw_roll[0], yaw_roll[1], 0, yaw_roll[2]);  //AR.Droneに命令を送る
   }
 
    //バッファーイメージに変換
@@ -92,7 +94,6 @@ void draw() {
   }
   catch(SocketException e) {
   }
-  // image(img, 0, 0,640,480);
 }
 
 BufferedImage PImage2BImage(PImage pImg) {  
@@ -139,6 +140,10 @@ void keyPressed() {
     else if (key == 'b') ardrone.move3D(10, 0, 0, -20);//turn right
     else if (key == 'n') ardrone.move3D(10, 0, 0, 20);//turn left
   }
+}
+
+void keyReleased() {
+  ardrone.stop();
 }
 
 void exit() {
