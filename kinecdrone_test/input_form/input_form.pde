@@ -10,6 +10,8 @@ color rectHighlight, circleHighlight;
 color currentColor;
 boolean rectOver = false;
 boolean circleOver = false;
+int got_address_flag = 0;
+String input_address = "";
 
 void setup() {
   size(360,140);
@@ -30,23 +32,31 @@ void setup() {
 void mousePressed(){
   if (rectOver) {
     String iLine = inputLine.getText();
+    input_address = iLine;
     println("inputLine: " + iLine);  
+    got_address_flag = 1;
     //currentColor = rectColor;
   }  
 }
 void draw() {
-  update(mouseX, mouseY);
-  background(currentColor);
-  
-  if (rectOver) {
-    fill(rectHighlight);
-  } else {
-    fill(rectColor);
-  }
-  stroke(255);
-  rect(rectX, rectY, rectSize, rectSize/2);
+  if(got_address_flag == 0){
+    update(mouseX, mouseY);
+    background(currentColor);
+    
+    if (rectOver) {
+      fill(rectHighlight);
+    } else {
+      fill(rectColor);
+    }
+    stroke(255);
+    rect(rectX, rectY, rectSize, rectSize/2);
 
-//  ellipse(circleX, circleY, circleSize, circleSize);
+  //  ellipse(circleX, circleY, circleSize, circleSize);
+  }
+  else{
+    //　接続してそこからの処理
+
+  }
 }
 
 void update(int x, int y) {
