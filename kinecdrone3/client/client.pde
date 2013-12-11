@@ -115,7 +115,7 @@ void draw() {
     Image awtImage = Toolkit.getDefaultToolkit().createImage(receivedBytes);
     receiveImage = loadImageMT(awtImage);
   }
-  
+
   //kinect プログラム
   // kinect.update();  
 

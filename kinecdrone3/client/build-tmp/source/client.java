@@ -182,7 +182,7 @@ public void draw() {
     Image awtImage = Toolkit.getDefaultToolkit().createImage(receivedBytes);
     receiveImage = loadImageMT(awtImage);
   }
-  
+
   //kinect \u30d7\u30ed\u30b0\u30e9\u30e0
   // kinect.update();  
 

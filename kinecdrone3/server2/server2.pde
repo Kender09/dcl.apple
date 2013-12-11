@@ -40,7 +40,7 @@ void setup() {
 
   chatServer = new Server(this,2001);
 
-  testImg = loadImage("buzz.jpg");
+  testImg = loadImage("buzz2.jpg");
 
   // ardrone = new ARDroneForP5("192.168.1.1");
   // ardrone.connect();  
