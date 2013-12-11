@@ -42,14 +42,14 @@ void setup() {
 
   testImg = loadImage("buzz.jpg");
 
-  ardrone = new ARDroneForP5("192.168.1.1");
-  ardrone.connect();  
-  //connect to the sensor info.
-  ardrone.connectNav();
-  //connect to the image info.
-  ardrone.connectVideo();
-  //start the connections.
-  ardrone.start();
+  // ardrone = new ARDroneForP5("192.168.1.1");
+  // ardrone.connect();  
+  // //connect to the sensor info.
+  // ardrone.connectNav();
+  // //connect to the image info.
+  // ardrone.connectVideo();
+  // //start the connections.
+  // ardrone.start();
 
   textSize(50);  
 }
@@ -57,8 +57,8 @@ void setup() {
 
 void draw() {
   background(0);  
-  PImage img = ardrone.getVideoImage(false);
-  // PImage img = testImg;
+  // PImage img = ardrone.getVideoImage(false);
+  PImage img = testImg;
   if (img == null){
     startFlag = 0;
     return;
@@ -72,9 +72,9 @@ void draw() {
     if(chatServer.available() != null){
       chatClient = chatServer.available();
       testS=chatClient.readStringUntil('\n');
-      ardroneMoveThread movethread = new ardroneMoveThread();
-      cthread = new Thread(movethread);
-      cthread.start();
+      // ardroneMoveThread movethread = new ardroneMoveThread();
+      // cthread = new Thread(movethread);
+      // cthread.start();
       ip_addr = chatClient.ip();
       remoteAddress = new InetSocketAddress(ip_addr,5100);
       println(ip_addr + testS);

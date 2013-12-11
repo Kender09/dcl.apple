@@ -103,7 +103,6 @@ PImage testImg;
 
 public void setup() {
   size(640, 480);
-  // ip_addr = "192.168.10.30";
 
   chatServer = new Server(this,2001);
 
@@ -143,7 +142,7 @@ public void draw() {
       // cthread = new Thread(movethread);
       // cthread.start();
       ip_addr = chatClient.ip();
-      // remoteAddress = new InetSocketAddress(ip_addr,5100);
+      remoteAddress = new InetSocketAddress(ip_addr,5100);
       println(ip_addr + testS);
       flag1 = 1;
     }else{
@@ -153,7 +152,6 @@ public void draw() {
   fill(250, 0, 0);
   text(ip_addr,100,100);
 
-  remoteAddress = new InetSocketAddress(ip_addr,5100);
   //\u30d0\u30c3\u30d5\u30a1\u30fc\u30a4\u30e1\u30fc\u30b8\u306b\u5909\u63db
   BufferedImage bfImage = PImage2BImage(img);
   //\u30b9\u30c8\u30ea\u30fc\u30e0\u306e\u6e96\u5099

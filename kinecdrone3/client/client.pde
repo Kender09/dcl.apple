@@ -42,6 +42,8 @@ int eye_height = 800;
 
 int drawKinectFlag = 1;
 
+PImage receiveImage;
+
 void setup() {
   size(640*2, 800, P3D);
 
@@ -51,9 +53,9 @@ void setup() {
   // Load fragment shader for oculus rift barrel distortion
   barrel = loadShader("barrel_frag.glsl");  
 
-  kinect = new SimpleOpenNI(this);
-  kinect.enableDepth();
-  kinect.enableUser(SimpleOpenNI.SKEL_PROFILE_ALL);
+  // kinect = new SimpleOpenNI(this);
+  // kinect.enableDepth();
+  // kinect.enableUser(SimpleOpenNI.SKEL_PROFILE_ALL);
   
   pose = new PoseOperation(kinect);
 
@@ -80,62 +82,66 @@ void draw() {
     cl =  new Client(this, ip_addr, 2001);
 
     flag2 = 1;
-    for(int ggg = 0 ;ggg<1000; ggg++){
       cl.write("test\n");
       text(ip_addr,100,100);
-    }
+    
 
     try {
     //受信ポート
       receiveSocket = new DatagramSocket(5100);
-    }
-      catch(SocketException e) {
-
+    }catch(SocketException e) {
+      println("receive err");
     }
     //受信用パケット
       receivePacket = new DatagramPacket(receivedBytes,receivedBytes.length);
     try{
         receiveSocket.setSoTimeout(1000);
       }catch(SocketException e){
+        println("packet err");
     }
     return;
   }
 
+  int flag5 = 1;
   //ARカメラ映像の取得
   try {
     receiveSocket.receive(receivePacket);
   }
   catch(IOException e) {
     text("miss",100,100);
+    flag5 = 0;
   } 
-  Image awtImage = Toolkit.getDefaultToolkit().createImage(receivedBytes);
-  PImage receiveImage = loadImageMT(awtImage);
-
-  //kinect プログラム
-  kinect.update();  
-
-  IntVector userList = new IntVector();
-  kinect.getUsers(userList);
-  if (userList.size() > 0) {
-    int userId = userList.get(0);
-    if( kinect.isTrackingSkeleton(userId) ){
-      drawKinectFlag = 0;
-      con = pose.posePressed(userId);
-      msg = con.yaw + ":" + con.roll +  ":" + con.spin + "\n";
-      println(msg);
-      cl.write(msg);
-    }else{
-      drawKinectFlag = 1;
-      con.yaw = 0;
-      con.roll = 0;
-      msg = con.yaw + ":" + con.roll + ":" + con.spin + "\n";
-    }
+  if(flag5 != 0){
+    Image awtImage = Toolkit.getDefaultToolkit().createImage(receivedBytes);
+    receiveImage = loadImageMT(awtImage);
   }
+  
+  //kinect プログラム
+  // kinect.update();  
+
+  // IntVector userList = new IntVector();
+  // kinect.getUsers(userList);
+  // if (userList.size() > 0) {
+  //   int userId = userList.get(0);
+  //   if( kinect.isTrackingSkeleton(userId) ){
+  //     drawKinectFlag = 0;
+  //     con = pose.posePressed(userId);
+  //     msg = con.yaw + ":" + con.roll +  ":" + con.spin + "\n";
+  //     println(msg);
+  //     cl.write(msg);
+  //   }else{
+  //     drawKinectFlag = 1;
+  //     con.yaw = 0;
+  //     con.roll = 0;
+  //     msg = con.yaw + ":" + con.roll + ":" + con.spin + "\n";
+  //   }
+  // }
 
   //oculusriftように映像を合成
   scene.beginDraw();
   scene.background(0);
-  scene.image(receiveImage, 0, 0, 640, 800);
+  if(receiveImage != null)
+    scene.image(receiveImage, 0, 0, 640, 800);
   if(drawKinectFlag == 1){
     // scene.image(kinect.depthImage(), 320-((640*0.8)/2), 400-((480*0.8)/2), 640*0.8,480*0.8);
   }else if(drawKinectFlag == 0){

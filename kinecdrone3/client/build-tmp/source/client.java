@@ -109,6 +109,8 @@ int eye_height = 800;
 
 int drawKinectFlag = 1;
 
+PImage receiveImage;
+
 public void setup() {
   size(640*2, 800, P3D);
 
@@ -118,9 +120,9 @@ public void setup() {
   // Load fragment shader for oculus rift barrel distortion
   barrel = loadShader("barrel_frag.glsl");  
 
-  kinect = new SimpleOpenNI(this);
-  kinect.enableDepth();
-  kinect.enableUser(SimpleOpenNI.SKEL_PROFILE_ALL);
+  // kinect = new SimpleOpenNI(this);
+  // kinect.enableDepth();
+  // kinect.enableUser(SimpleOpenNI.SKEL_PROFILE_ALL);
   
   pose = new PoseOperation(kinect);
 
@@ -147,62 +149,66 @@ public void draw() {
     cl =  new Client(this, ip_addr, 2001);
 
     flag2 = 1;
-    for(int ggg = 0 ;ggg<1000; ggg++){
       cl.write("test\n");
       text(ip_addr,100,100);
-    }
+    
 
     try {
     //\u53d7\u4fe1\u30dd\u30fc\u30c8
       receiveSocket = new DatagramSocket(5100);
-    }
-      catch(SocketException e) {
-
+    }catch(SocketException e) {
+      println("receive err");
     }
     //\u53d7\u4fe1\u7528\u30d1\u30b1\u30c3\u30c8
       receivePacket = new DatagramPacket(receivedBytes,receivedBytes.length);
     try{
         receiveSocket.setSoTimeout(1000);
       }catch(SocketException e){
+        println("packet err");
     }
     return;
   }
 
+  int flag5 = 1;
   //AR\u30ab\u30e1\u30e9\u6620\u50cf\u306e\u53d6\u5f97
   try {
     receiveSocket.receive(receivePacket);
   }
   catch(IOException e) {
     text("miss",100,100);
+    flag5 = 0;
   } 
-  Image awtImage = Toolkit.getDefaultToolkit().createImage(receivedBytes);
-  PImage receiveImage = loadImageMT(awtImage);
-
-  //kinect \u30d7\u30ed\u30b0\u30e9\u30e0
-  kinect.update();  
-
-  IntVector userList = new IntVector();
-  kinect.getUsers(userList);
-  if (userList.size() > 0) {
-    int userId = userList.get(0);
-    if( kinect.isTrackingSkeleton(userId) ){
-      drawKinectFlag = 0;
-      con = pose.posePressed(userId);
-      msg = con.yaw + ":" + con.roll +  ":" + con.spin + "\n";
-      println(msg);
-      cl.write(msg);
-    }else{
-      drawKinectFlag = 1;
-      con.yaw = 0;
-      con.roll = 0;
-      msg = con.yaw + ":" + con.roll + ":" + con.spin + "\n";
-    }
+  if(flag5 != 0){
+    Image awtImage = Toolkit.getDefaultToolkit().createImage(receivedBytes);
+    receiveImage = loadImageMT(awtImage);
   }
+  
+  //kinect \u30d7\u30ed\u30b0\u30e9\u30e0
+  // kinect.update();  
+
+  // IntVector userList = new IntVector();
+  // kinect.getUsers(userList);
+  // if (userList.size() > 0) {
+  //   int userId = userList.get(0);
+  //   if( kinect.isTrackingSkeleton(userId) ){
+  //     drawKinectFlag = 0;
+  //     con = pose.posePressed(userId);
+  //     msg = con.yaw + ":" + con.roll +  ":" + con.spin + "\n";
+  //     println(msg);
+  //     cl.write(msg);
+  //   }else{
+  //     drawKinectFlag = 1;
+  //     con.yaw = 0;
+  //     con.roll = 0;
+  //     msg = con.yaw + ":" + con.roll + ":" + con.spin + "\n";
+  //   }
+  // }
 
   //oculusrift\u3088\u3046\u306b\u6620\u50cf\u3092\u5408\u6210
   scene.beginDraw();
   scene.background(0);
-  scene.image(receiveImage, 0, 0, 640, 800);
+  if(receiveImage != null)
+    scene.image(receiveImage, 0, 0, 640, 800);
   if(drawKinectFlag == 1){
     // scene.image(kinect.depthImage(), 320-((640*0.8)/2), 400-((480*0.8)/2), 640*0.8,480*0.8);
   }else if(drawKinectFlag == 0){
