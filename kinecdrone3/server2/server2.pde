@@ -21,6 +21,7 @@ byte[] sendBytes;
 
 byte[] receivedBytes = new byte[300000];
 
+Server chatServer;
 Client chatClient;
 float Val;
 String smsg;
@@ -29,45 +30,60 @@ int startFlag = 0;
 
 Thread cthread;
 
+String ip_addr;
+int flag1=0;
+PImage testImg;
+
 void setup() {
   size(640, 480);
-  String ip_addr = "192.168.10.30";
+  // ip_addr = "192.168.10.30";
 
-  remoteAddress = new InetSocketAddress(ip_addr,5100);
+  chatServer = new Server(this,2001);
 
+  testImg = loadImage("buzz.jpg");
 
-  chatClient = new Client(this, ip_addr, 2001);
-
-
-  ardrone = new ARDroneForP5("192.168.1.1");
-  ardrone.connect();  
-  //connect to the sensor info.
-  ardrone.connectNav();
-  //connect to the image info.
-  ardrone.connectVideo();
-  //start the connections.
-  ardrone.start();
+  // ardrone = new ARDroneForP5("192.168.1.1");
+  // ardrone.connect();  
+  // //connect to the sensor info.
+  // ardrone.connectNav();
+  // //connect to the image info.
+  // ardrone.connectVideo();
+  // //start the connections.
+  // ardrone.start();
 
   textSize(50);  
-
-  ardroneMoveThread movethread = new ardroneMoveThread();
-  cthread = new Thread(movethread);
-
-  cthread.start();
-
 }
 
 
 void draw() {
   background(0);  
-  PImage img = ardrone.getVideoImage(false);
+  // PImage img = ardrone.getVideoImage(false);
+  PImage img = testImg;
   if (img == null){
     startFlag = 0;
     return;
   }else{
     startFlag = 1;
     image(img, 0, 0,640,480);
+    text(run,0,0);
   }
+
+  chatClient = chatServer.available();
+  if(chatClient != null){
+    if(flag1 == 0){
+      // ardroneMoveThread movethread = new ardroneMoveThread();
+      // cthread = new Thread(movethread);
+      // cthread.start();
+      ip_addr = chatClient.ip();
+      // remoteAddress = new InetSocketAddress(ip_addr,5100);
+      text(ip_addr,100,100);
+      flag1 = 1;
+    } 
+  }else{
+      return;
+  }
+      text(ip_addr,100,100);
+return;
   //バッファーイメージに変換
   BufferedImage bfImage = PImage2BImage(img);
   //ストリームの準備
@@ -156,10 +172,11 @@ void exit() {
 public class ardroneMoveThread implements Runnable{
   public void run() {
     while (true){
-      if(startFlag != 1){
+      if(startFlag != 1 && flag1 != 1){
         continue;
       }
-      if(chatClient.available()>0){
+      if(chatServer.available() != null){
+        chatClient = chatServer.available();
         smsg=chatClient.readStringUntil('\n');
         // println(smsg);
         // 文字列からyaw,rollの数値を取得

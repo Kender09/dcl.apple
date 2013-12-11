@@ -91,6 +91,8 @@ DatagramSocket receiveSocket;
 
 Server chatServer;
 Client cl;
+String ip_addr;
+int flag1 = 0, flag2 = 0;
 
 String msg;
 
@@ -116,8 +118,6 @@ public void setup() {
   // Load fragment shader for oculus rift barrel distortion
   barrel = loadShader("barrel_frag.glsl");  
 
-  chatServer = new Server(this,2001);
-
   kinect = new SimpleOpenNI(this);
   kinect.enableDepth();
   kinect.enableUser(SimpleOpenNI.SKEL_PROFILE_ALL);
@@ -130,26 +130,36 @@ public void setup() {
 
   frameRate(10);
 
-  try {
-    //\u53d7\u4fe1\u30dd\u30fc\u30c8
-    receiveSocket = new DatagramSocket(5100);
-  }
-  catch(SocketException e) {
-  }
-  //\u53d7\u4fe1\u7528\u30d1\u30b1\u30c3\u30c8
-  receivePacket = new DatagramPacket(receivedBytes,receivedBytes.length);
-  try{
-    receiveSocket.setSoTimeout(1000);
-  }catch(SocketException e){
-  }
 }
 
 
 public void draw() {
   background(0);
 
-    cl = chatServer.available();
-  if(cl !=null) println("connected");
+  if(flag1 == 0){
+
+    return;
+  }else if(flag1 == 1){
+    ip_addr = "localhost";
+  }
+
+  if(flag2 == 0){
+    cl =  new Client(this, ip_addr, 2001);
+
+    try {
+    //\u53d7\u4fe1\u30dd\u30fc\u30c8
+      receiveSocket = new DatagramSocket(5100);
+    }
+      catch(SocketException e) {
+    }
+    //\u53d7\u4fe1\u7528\u30d1\u30b1\u30c3\u30c8
+      receivePacket = new DatagramPacket(receivedBytes,receivedBytes.length);
+    try{
+        receiveSocket.setSoTimeout(1000);
+      }catch(SocketException e){
+    }
+    flag2 = 1;
+  }
 
   //AR\u30ab\u30e1\u30e9\u6620\u50cf\u306e\u53d6\u5f97
   try {
@@ -173,7 +183,7 @@ public void draw() {
       con = pose.posePressed(userId);
       msg = con.yaw + ":" + con.roll +  ":" + con.spin + "\n";
       println(msg);
-      chatServer.write(msg);
+      cl.write(msg);
     }else{
       drawKinectFlag = 1;
       con.yaw = 0;
@@ -282,6 +292,12 @@ public void set_shader(String eye)
   barrel.set("Scale", (w/2.0f) * scaleFactor, (h/2.0f) * scaleFactor * as);
   barrel.set("ScaleIn", (2.0f/w), (2.0f/h) / as);
   barrel.set("HmdWarpParam", K0, K1, K2, K3);
+}
+
+public void keyPressed() {
+   if (key == 'e') {
+      flag1 = 1;
+    }
 }
 public  int count;
 

@@ -24,6 +24,8 @@ DatagramSocket receiveSocket;
 
 Server chatServer;
 Client cl;
+String ip_addr;
+int flag1 = 0, flag2 = 0;
 
 String msg;
 
@@ -49,8 +51,6 @@ void setup() {
   // Load fragment shader for oculus rift barrel distortion
   barrel = loadShader("barrel_frag.glsl");  
 
-  chatServer = new Server(this,2001);
-
   kinect = new SimpleOpenNI(this);
   kinect.enableDepth();
   kinect.enableUser(SimpleOpenNI.SKEL_PROFILE_ALL);
@@ -63,26 +63,36 @@ void setup() {
 
   frameRate(10);
 
-  try {
-    //受信ポート
-    receiveSocket = new DatagramSocket(5100);
-  }
-  catch(SocketException e) {
-  }
-  //受信用パケット
-  receivePacket = new DatagramPacket(receivedBytes,receivedBytes.length);
-  try{
-    receiveSocket.setSoTimeout(1000);
-  }catch(SocketException e){
-  }
 }
 
 
 void draw() {
   background(0);
 
-    cl = chatServer.available();
-  if(cl !=null) println("connected");
+  if(flag1 == 0){
+
+    return;
+  }else if(flag1 == 1){
+    ip_addr = "localhost";
+  }
+
+  if(flag2 == 0){
+    cl =  new Client(this, ip_addr, 2001);
+
+    try {
+    //受信ポート
+      receiveSocket = new DatagramSocket(5100);
+    }
+      catch(SocketException e) {
+    }
+    //受信用パケット
+      receivePacket = new DatagramPacket(receivedBytes,receivedBytes.length);
+    try{
+        receiveSocket.setSoTimeout(1000);
+      }catch(SocketException e){
+    }
+    flag2 = 1;
+  }
 
   //ARカメラ映像の取得
   try {
@@ -106,7 +116,7 @@ void draw() {
       con = pose.posePressed(userId);
       msg = con.yaw + ":" + con.roll +  ":" + con.spin + "\n";
       println(msg);
-      chatServer.write(msg);
+      cl.write(msg);
     }else{
       drawKinectFlag = 1;
       con.yaw = 0;
@@ -215,4 +225,10 @@ void set_shader(String eye)
   barrel.set("Scale", (w/2.0f) * scaleFactor, (h/2.0f) * scaleFactor * as);
   barrel.set("ScaleIn", (2.0f/w), (2.0f/h) / as);
   barrel.set("HmdWarpParam", K0, K1, K2, K3);
+}
+
+void keyPressed() {
+   if (key == 'e') {
+      flag1 = 1;
+    }
 }

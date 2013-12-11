@@ -87,6 +87,7 @@ byte[] sendBytes;
 
 byte[] receivedBytes = new byte[300000];
 
+Server chatServer;
 Client chatClient;
 float Val;
 String smsg;
@@ -95,45 +96,60 @@ int startFlag = 0;
 
 Thread cthread;
 
+String ip_addr;
+int flag1=0;
+PImage testImg;
+
 public void setup() {
   size(640, 480);
-  String ip_addr = "192.168.10.30";
+  // ip_addr = "192.168.10.30";
 
-  remoteAddress = new InetSocketAddress(ip_addr,5100);
+  chatServer = new Server(this,2001);
 
+  testImg = loadImage("buzz.jpg");
 
-  chatClient = new Client(this, ip_addr, 2001);
-
-
-  ardrone = new ARDroneForP5("192.168.1.1");
-  ardrone.connect();  
-  //connect to the sensor info.
-  ardrone.connectNav();
-  //connect to the image info.
-  ardrone.connectVideo();
-  //start the connections.
-  ardrone.start();
+  // ardrone = new ARDroneForP5("192.168.1.1");
+  // ardrone.connect();  
+  // //connect to the sensor info.
+  // ardrone.connectNav();
+  // //connect to the image info.
+  // ardrone.connectVideo();
+  // //start the connections.
+  // ardrone.start();
 
   textSize(50);  
-
-  ardroneMoveThread movethread = new ardroneMoveThread();
-  cthread = new Thread(movethread);
-
-  cthread.start();
-
 }
 
 
 public void draw() {
   background(0);  
-  PImage img = ardrone.getVideoImage(false);
+  // PImage img = ardrone.getVideoImage(false);
+  PImage img = testImg;
   if (img == null){
     startFlag = 0;
     return;
   }else{
     startFlag = 1;
     image(img, 0, 0,640,480);
+    text(run,0,0);
   }
+
+  chatClient = chatServer.available();
+  if(chatClient != null){
+    if(flag1 == 0){
+      // ardroneMoveThread movethread = new ardroneMoveThread();
+      // cthread = new Thread(movethread);
+      // cthread.start();
+      ip_addr = chatClient.ip();
+      // remoteAddress = new InetSocketAddress(ip_addr,5100);
+      text(ip_addr,100,100);
+      flag1 = 1;
+    } 
+  }else{
+      return;
+  }
+      text(ip_addr,100,100);
+return;
   //\u30d0\u30c3\u30d5\u30a1\u30fc\u30a4\u30e1\u30fc\u30b8\u306b\u5909\u63db
   BufferedImage bfImage = PImage2BImage(img);
   //\u30b9\u30c8\u30ea\u30fc\u30e0\u306e\u6e96\u5099
@@ -222,10 +238,11 @@ public void exit() {
 public class ardroneMoveThread implements Runnable{
   public void run() {
     while (true){
-      if(startFlag != 1){
+      if(startFlag != 1 && flag1 != 1){
         continue;
       }
-      if(chatClient.available()>0){
+      if(chatServer.available() != null){
+        chatClient = chatServer.available();
         smsg=chatClient.readStringUntil('\n');
         // println(smsg);
         // \u6587\u5b57\u5217\u304b\u3089yaw,roll\u306e\u6570\u5024\u3092\u53d6\u5f97
