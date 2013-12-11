@@ -25,6 +25,7 @@ Server chatServer;
 Client chatClient;
 float Val;
 String smsg;
+String testS;
 
 int startFlag = 0;
 
@@ -65,25 +66,29 @@ void draw() {
   }else{
     startFlag = 1;
     image(img, 0, 0,640,480);
-    text(run,0,0);
+    text("run",0,0);
   }
 
-  chatClient = chatServer.available();
-  if(chatClient != null){
-    if(flag1 == 0){
+  if(flag1 == 0){
+    if(chatServer.available() != null){
+      chatClient = chatServer.available();
+      testS=chatClient.readStringUntil('\n');
       // ardroneMoveThread movethread = new ardroneMoveThread();
       // cthread = new Thread(movethread);
       // cthread.start();
       ip_addr = chatClient.ip();
-      // remoteAddress = new InetSocketAddress(ip_addr,5100);
-      text(ip_addr,100,100);
+      remoteAddress = new InetSocketAddress(ip_addr,5100);
+      text(ip_addr + testS,100,100);
       flag1 = 1;
-    } 
-  }else{
+    }else{
       return;
+    }
   }
-      text(ip_addr,100,100);
-return;
+  
+  chatClient = chatServer.available();
+  testS=chatClient.readStringUntil('\n');
+  text(ip_addr + testS,100,100);
+
   //バッファーイメージに変換
   BufferedImage bfImage = PImage2BImage(img);
   //ストリームの準備

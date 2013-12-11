@@ -298,6 +298,9 @@ public void keyPressed() {
    if (key == 'e') {
       flag1 = 1;
     }
+    if(key == 'a'){
+      cl.write("test\n");
+    }
 }
 public  int count;
 

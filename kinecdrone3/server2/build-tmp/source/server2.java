@@ -91,6 +91,7 @@ Server chatServer;
 Client chatClient;
 float Val;
 String smsg;
+String testS;
 
 int startFlag = 0;
 
@@ -131,25 +132,29 @@ public void draw() {
   }else{
     startFlag = 1;
     image(img, 0, 0,640,480);
-    text(run,0,0);
+    text("run",0,0);
   }
 
-  chatClient = chatServer.available();
-  if(chatClient != null){
-    if(flag1 == 0){
+  if(flag1 == 0){
+    if(chatServer.available() != null){
+      chatClient = chatServer.available();
+      testS=chatClient.readStringUntil('\n');
       // ardroneMoveThread movethread = new ardroneMoveThread();
       // cthread = new Thread(movethread);
       // cthread.start();
       ip_addr = chatClient.ip();
-      // remoteAddress = new InetSocketAddress(ip_addr,5100);
-      text(ip_addr,100,100);
+      remoteAddress = new InetSocketAddress(ip_addr,5100);
+      text(ip_addr + testS,100,100);
       flag1 = 1;
-    } 
-  }else{
+    }else{
       return;
+    }
   }
-      text(ip_addr,100,100);
-return;
+  
+  chatClient = chatServer.available();
+  testS=chatClient.readStringUntil('\n');
+  text(ip_addr + testS,100,100);
+
   //\u30d0\u30c3\u30d5\u30a1\u30fc\u30a4\u30e1\u30fc\u30b8\u306b\u5909\u63db
   BufferedImage bfImage = PImage2BImage(img);
   //\u30b9\u30c8\u30ea\u30fc\u30e0\u306e\u6e96\u5099
