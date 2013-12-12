@@ -5,14 +5,9 @@ import processing.opengl.*;
 
 import processing.net.*; 
 import SimpleOpenNI.*; 
-import processing.video.*; 
-import java.awt.image.*; 
 import java.awt.*; 
 import javax.imageio.*; 
-import java.net.DatagramPacket; 
-import java.net.DatagramSocket; 
 import java.net.*; 
-import java.*; 
 
 import org.slf4j.helpers.*; 
 import com.xuggle.xuggler.video.*; 
@@ -70,34 +65,24 @@ public class client extends PApplet {
 
 
 
-
-
-
-  
-
-
-
-
+// import java.*;
 
 SimpleOpenNI  kinect;
-
 PoseOperation pose;
-
 ArDroneOrder con;
 
 DatagramPacket sendPacket;
 DatagramPacket receivePacket;
 DatagramSocket receiveSocket;
 
-Server chatServer;
-Client cl;
-String ip_addr;
-int flag1 = 0, flag2 = 0;
+Client droneConClient;
+String ipAddr;
+int inputIpFlag = 0;
+int conectFlag = 0;
 
-String msg;
-String input_ip = "";
+String droneConSmsg;
+String inputIpAdd = "";
 
-byte[] sendBytes;
 //\u53d7\u4fe1\u3059\u308b\u30d0\u30a4\u30c8\u914d\u5217\u3092\u683c\u7d0d\u3059\u308b\u7bb1
 byte[] receivedBytes = new byte[300000];
  
@@ -109,7 +94,6 @@ int eye_width = 640;
 int eye_height = 800;
 
 int drawKinectFlag = 1;
-
 PImage receiveImage;
 
 public void setup() {
@@ -121,25 +105,22 @@ public void setup() {
   // Load fragment shader for oculus rift barrel distortion
   barrel = loadShader("barrel_frag.glsl");  
 
-  // kinect = new SimpleOpenNI(this);
-  // kinect.enableDepth();
-  // kinect.enableUser(SimpleOpenNI.SKEL_PROFILE_ALL);
-  
+  kinect = new SimpleOpenNI(this);
+  kinect.enableDepth();
+  kinect.enableUser(SimpleOpenNI.SKEL_PROFILE_ALL);
   pose = new PoseOperation(kinect);
-
   con = new ArDroneOrder();
   con.yaw = 0;
   con.roll = 0;
 
   frameRate(10);
-  textSize(50);
 }
 
 
 public void draw() {
   background(0);
 
-  if(flag1 == 0){
+  if(inputIpFlag == 0){
     textAlign(CENTER, CENTER);
     textSize(60);
     fill(100,100,200);
@@ -148,17 +129,16 @@ public void draw() {
     fill(255);
     text("Input IP Address",width/2, height/2 + 10);
     textSize(50);
-    text(input_ip, width/2, height/2 + 100);
+    text(inputIpAdd, width/2, height/2 + 100);
     return;
-  }else if(flag1 == 1){
-    ip_addr = input_ip;
+  }else if(inputIpFlag == 1){
+    ipAddr = inputIpAdd;
   }
 
-  if(flag2 == 0){
-    cl =  new Client(this, ip_addr, 2001);
-    flag2 = 1;
-    cl.write("test\n");
-    
+  if(conectFlag == 0){
+    droneConClient =  new Client(this, ipAddr, 2001);
+    conectFlag = 1;
+    droneConClient.write("test\n");
     try {
     //\u53d7\u4fe1\u30dd\u30fc\u30c8
       receiveSocket = new DatagramSocket(5100);
@@ -175,40 +155,39 @@ public void draw() {
     return;
   }
 
-  int flag5 = 1;
+  int receiveImgFlag = 1;
   //AR\u30ab\u30e1\u30e9\u6620\u50cf\u306e\u53d6\u5f97
   try {
     receiveSocket.receive(receivePacket);
   }
   catch(IOException e) {
-    text("miss",100,100);
-    flag5 = 0;
+    println("miss");
+    receiveImgFlag = 0;
   } 
-  if(flag5 != 0){
+  if(receiveImgFlag != 0){
     Image awtImage = Toolkit.getDefaultToolkit().createImage(receivedBytes);
     receiveImage = loadImageMT(awtImage);
   }
 
   //kinect \u30d7\u30ed\u30b0\u30e9\u30e0
-  // kinect.update();  
-
-  // IntVector userList = new IntVector();
-  // kinect.getUsers(userList);
-  // if (userList.size() > 0) {
-  //   int userId = userList.get(0);
-  //   if( kinect.isTrackingSkeleton(userId) ){
-  //     drawKinectFlag = 0;
-  //     con = pose.posePressed(userId);
-  //     msg = con.yaw + ":" + con.roll +  ":" + con.spin + "\n";
-  //     println(msg);
-  //     cl.write(msg);
-  //   }else{
-  //     drawKinectFlag = 1;
-  //     con.yaw = 0;
-  //     con.roll = 0;
-  //     msg = con.yaw + ":" + con.roll + ":" + con.spin + "\n";
-  //   }
-  // }
+  kinect.update();  
+  IntVector userList = new IntVector();
+  kinect.getUsers(userList);
+  if (userList.size() > 0) {
+    int userId = userList.get(0);
+    if( kinect.isTrackingSkeleton(userId) ){
+      drawKinectFlag = 0;
+      con = pose.posePressed(userId);
+      droneConSmsg = con.yaw + ":" + con.roll +  ":" + con.spin + "\n";
+      println(droneConSmsg);
+      droneConClient.write(droneConSmsg);
+    }else{
+      drawKinectFlag = 1;
+      con.yaw = 0;
+      con.roll = 0;
+      droneConSmsg = con.yaw + ":" + con.roll + ":" + con.spin + "\n";
+    }
+  }
 
   //oculusrift\u3088\u3046\u306b\u6620\u50cf\u3092\u5408\u6210
   scene.beginDraw();
@@ -216,12 +195,12 @@ public void draw() {
   if(receiveImage != null)
     scene.image(receiveImage, 0, 0, 640, 800);
   if(drawKinectFlag == 1){
-    // scene.image(kinect.depthImage(), 320-((640*0.8)/2), 400-((480*0.8)/2), 640*0.8,480*0.8);
+    scene.image(kinect.depthImage(), 320-((640*0.8f)/2), 400-((480*0.8f)/2), 640*0.8f,480*0.8f);
   }else if(drawKinectFlag == 0){
     // scene.image(kinect.depthImage(), 0, 800-(480*0.8), 640*0.8,480*0.8);
     scene.textSize(30);
     scene.fill(250, 0, 0);
-    scene.text(msg,250, 500);
+    scene.text(droneConSmsg,250, 500);
   }
   scene.translate(scene.width/2, scene.height/2, 100);
   scene.endDraw();
@@ -247,7 +226,6 @@ public void draw() {
   fb.image(scene, eye_width-50, 0, eye_width, eye_height);
   fb.endDraw();
   image(fb, 0, 0);
-
 }
 
 // user-tracking callbacks!
@@ -314,13 +292,13 @@ public void set_shader(String eye)
 }
 
 public void keyPressed() {
-  input_ip = input_ip + key;
+  inputIpAdd = inputIpAdd + key;
   if(key =='\n') {
-    input_ip="";
-    flag1 = 1;
+    inputIpAdd="";
+    inputIpFlag = 1;
   }
   if (keyCode == CONTROL) {
-    input_ip="";
+    inputIpAdd="";
   }
 }
 public  int count;

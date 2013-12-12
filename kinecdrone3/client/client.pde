@@ -1,36 +1,25 @@
 import processing.net.*;
-
 import SimpleOpenNI.*;
-
-import processing.video.*;
-import java.awt.image.*;
+import java.net.*;
 import java.awt.*;
 import javax.imageio.*;
-import java.net.DatagramPacket;  
-import java.net.DatagramSocket;
-import java.net.*;
-
-import java.*;
 
 SimpleOpenNI  kinect;
-
 PoseOperation pose;
-
 ArDroneOrder con;
 
 DatagramPacket sendPacket;
 DatagramPacket receivePacket;
 DatagramSocket receiveSocket;
 
-Server chatServer;
-Client cl;
-String ip_addr;
+Client droneConClient;
+String ipAddr;
+int inputIpFlag = 0;
 int conectFlag = 0;
 
-String msg;
-String input_ip = "";
+String droneConSmsg;
+String inputIpAdd = "";
 
-byte[] sendBytes;
 //受信するバイト配列を格納する箱
 byte[] receivedBytes = new byte[300000];
  
@@ -42,7 +31,6 @@ int eye_width = 640;
 int eye_height = 800;
 
 int drawKinectFlag = 1;
-
 PImage receiveImage;
 
 void setup() {
@@ -69,7 +57,7 @@ void setup() {
 void draw() {
   background(0);
 
-  if(flag1 == 0){
+  if(inputIpFlag == 0){
     textAlign(CENTER, CENTER);
     textSize(60);
     fill(100,100,200);
@@ -78,17 +66,16 @@ void draw() {
     fill(255);
     text("Input IP Address",width/2, height/2 + 10);
     textSize(50);
-    text(input_ip, width/2, height/2 + 100);
+    text(inputIpAdd, width/2, height/2 + 100);
     return;
-  }else if(flag1 == 1){
-    ip_addr = input_ip;
+  }else if(inputIpFlag == 1){
+    ipAddr = inputIpAdd;
   }
 
   if(conectFlag == 0){
-    cl =  new Client(this, ip_addr, 2001);
+    droneConClient =  new Client(this, ipAddr, 2001);
     conectFlag = 1;
-    cl.write("test\n");
-    
+    droneConClient.write("test\n");
     try {
     //受信ポート
       receiveSocket = new DatagramSocket(5100);
@@ -128,14 +115,14 @@ void draw() {
     if( kinect.isTrackingSkeleton(userId) ){
       drawKinectFlag = 0;
       con = pose.posePressed(userId);
-      msg = con.yaw + ":" + con.roll +  ":" + con.spin + "\n";
-      println(msg);
-      cl.write(msg);
+      droneConSmsg = con.yaw + ":" + con.roll +  ":" + con.spin + "\n";
+      println(droneConSmsg);
+      droneConClient.write(droneConSmsg);
     }else{
       drawKinectFlag = 1;
       con.yaw = 0;
       con.roll = 0;
-      msg = con.yaw + ":" + con.roll + ":" + con.spin + "\n";
+      droneConSmsg = con.yaw + ":" + con.roll + ":" + con.spin + "\n";
     }
   }
 
@@ -150,7 +137,7 @@ void draw() {
     // scene.image(kinect.depthImage(), 0, 800-(480*0.8), 640*0.8,480*0.8);
     scene.textSize(30);
     scene.fill(250, 0, 0);
-    scene.text(msg,250, 500);
+    scene.text(droneConSmsg,250, 500);
   }
   scene.translate(scene.width/2, scene.height/2, 100);
   scene.endDraw();
@@ -176,7 +163,6 @@ void draw() {
   fb.image(scene, eye_width-50, 0, eye_width, eye_height);
   fb.endDraw();
   image(fb, 0, 0);
-
 }
 
 // user-tracking callbacks!
@@ -243,12 +229,12 @@ void set_shader(String eye)
 }
 
 void keyPressed() {
-  input_ip = input_ip + key;
+  inputIpAdd = inputIpAdd + key;
   if(key =='\n') {
-    input_ip="";
-    flag1 = 1;
+    inputIpAdd="";
+    inputIpFlag = 1;
   }
   if (keyCode == CONTROL) {
-    input_ip="";
+    inputIpAdd="";
   }
 }
