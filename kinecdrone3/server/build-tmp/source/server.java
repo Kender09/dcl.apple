@@ -5,13 +5,10 @@ import processing.opengl.*;
 
 import processing.net.*; 
 import com.shigeodayo.ardrone.processing.*; 
-import processing.video.*; 
-import java.awt.image.*; 
-import java.awt.*; 
-import javax.imageio.*; 
 import java.io.*; 
-import java.net.DatagramPacket; 
 import java.net.*; 
+import java.awt.image.*; 
+import javax.imageio.*; 
 
 import org.slf4j.helpers.*; 
 import com.xuggle.xuggler.video.*; 
@@ -71,36 +68,26 @@ public class server extends PApplet {
 
 
 
-
-  
-
-
 ARDroneForP5 ardrone;
 
 InetSocketAddress remoteAddress;
 DatagramPacket sendPacket;
-DatagramPacket receivePacket;
-DatagramSocket receiveSocket;
- 
 //\u9001\u4fe1\u3059\u308b\u30d0\u30a4\u30c8\u914d\u5217
 byte[] sendBytes;
 
-byte[] receivedBytes = new byte[300000];
-
-Client chatClient;
+Server droneConSever;
+Client droneConClient;
 float Val;
-String smsg;
+String droneConMsg;
+String testMsg;
+int startFlag = 0;
+String ipAddr;
+int conectFlag=0;
 
 public void setup() {
   size(640, 480);
-  String ip_addr = "192.168.10.30";
 
-  remoteAddress = new InetSocketAddress(ip_addr,5100);
-
-
-  chatClient = new Client(this, ip_addr, 2001);
-
-
+  droneConSever = new Server(this,2001);
   ardrone = new ARDroneForP5("192.168.1.1");
   ardrone.connect();  
   //connect to the sensor info.
@@ -110,33 +97,49 @@ public void setup() {
   //start the connections.
   ardrone.start();
 
-  textSize(50);  
-
+  textSize(30);  
 }
-
 
 public void draw() {
   background(0);  
   PImage img = ardrone.getVideoImage(false);
   if (img == null){
+    startFlag = 0;
     return;
   }else{
-    // image(img, 0, 0,640,480);
+    startFlag = 1;
+    image(img, 0, 0,640,480);
   }
-  // capture.read();
-  if(chatClient.available()>0){
-    smsg=chatClient.readStringUntil('\n');
-    // println(smsg);
-    // \u6587\u5b57\u5217\u304b\u3089yaw,roll\u306e\u6570\u5024\u3092\u53d6\u5f97
-    int [] yaw_roll = PApplet.parseInt(split(smsg, ":"));
 
+  if(conectFlag == 0){
+    if(droneConSever.available() != null){
+      droneConClient = droneConSever.available();
+      testMsg=droneConClient.readStringUntil('\n');
+      ipAddr = droneConClient.ip();
+      remoteAddress = new InetSocketAddress(ipAddr,5100);
+      println(ipAddr + testMsg);
+      conectFlag = 1;
+    }else{
+      return;
+    }
+  }
+  fill(250, 0, 0);
+  text(ipAddr,100,100);
+
+  if(droneConSever.available() != null){
+    droneConClient = droneConSever.available();
+    droneConMsg=droneConClient.readStringUntil('\n');
+    // println(droneConMsg);
+    // \u6587\u5b57\u5217\u304b\u3089yaw,roll\u306e\u6570\u5024\u3092\u53d6\u5f97
+    int [] yaw_roll = PApplet.parseInt(split(droneConMsg, ":"));
     // ardrone\u64cd\u4f5c\u306e\u547d\u4ee4
     println(yaw_roll[0] + " : " + yaw_roll[1] + " : " + yaw_roll[2]);
-    text(yaw_roll[0] + " : " + yaw_roll[1] + " : " + yaw_roll[2], 400,100);
+    fill(250, 250, 250);
+    text(yaw_roll[0] + " : " + yaw_roll[1] + " : " + yaw_roll[2], 100,300);
     // ardrone.move3D(yaw_roll[0], yaw_roll[1], 0, yaw_roll[2]);  //AR.Drone\u306b\u547d\u4ee4\u3092\u9001\u308b
   }
 
-   //\u30d0\u30c3\u30d5\u30a1\u30fc\u30a4\u30e1\u30fc\u30b8\u306b\u5909\u63db
+  //\u30d0\u30c3\u30d5\u30a1\u30fc\u30a4\u30e1\u30fc\u30b8\u306b\u5909\u63db
   BufferedImage bfImage = PImage2BImage(img);
   //\u30b9\u30c8\u30ea\u30fc\u30e0\u306e\u6e96\u5099
   ByteArrayOutputStream bos = new ByteArrayOutputStream();
@@ -149,6 +152,7 @@ public void draw() {
     os.close();
   }
   catch(IOException e) {
+    text("error0",100,150);
   }
   sendBytes = bos.toByteArray();
   try {
@@ -156,12 +160,12 @@ public void draw() {
     try{
       new DatagramSocket().send(sendPacket);
     } catch(IOException e){
+      text("error1",100,200);
     }
-    // println("bufferImageSended:"+sendBytes.length+" bytes #2");
   }
   catch(SocketException e) {
+    text("error2",100,300);
   }
-  // image(img, 0, 0,640,480);
 }
 
 public BufferedImage PImage2BImage(PImage pImg) {  
@@ -208,6 +212,10 @@ public void keyPressed() {
     else if (key == 'b') ardrone.move3D(10, 0, 0, -20);//turn right
     else if (key == 'n') ardrone.move3D(10, 0, 0, 20);//turn left
   }
+}
+
+public void keyReleased() {
+  ardrone.stop();
 }
 
 public void exit() {

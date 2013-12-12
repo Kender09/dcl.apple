@@ -1,30 +1,13 @@
 import processing.net.*;
-
 import SimpleOpenNI.*;
-
-import processing.video.*;
-import java.awt.image.*;
-import java.awt.*;
-import javax.imageio.*;
-
-
-import java.*;
-
 import com.shigeodayo.ardrone.processing.*;
 
 ARDroneForP5 ardrone;
-
-// import fullscreen.*; 
-// FullScreen fs;
-
 SimpleOpenNI  kinect;
-
 PoseOperation pose;
-
 ArDroneOrder con;
-
-String msg;
-
+String droneConMsg;
+int drawKinectFlag = 1;
 //oculur riftように画像変換
 PShader barrel;
 PGraphics fb;
@@ -32,13 +15,8 @@ PGraphics scene;
 int eye_width = 640;
 int eye_height = 800;
 
-int drawKinectFlag = 1;
-
 void setup() {
   size(640*2, 800, P3D);
-
-  // fs = new FullScreen(this); 
-  // fs.enter();
 
   ardrone = new ARDroneForP5("192.168.1.1");
   //connect to the AR.Drone.
@@ -61,7 +39,6 @@ void setup() {
   kinect.enableUser(SimpleOpenNI.SKEL_PROFILE_ALL);
   
   pose = new PoseOperation(kinect);
-
   con = new ArDroneOrder();
   con.yaw = 0;
   con.roll = 0;
@@ -70,8 +47,6 @@ void setup() {
 
 void draw() {
   background(0);
-
-
   //ARカメラ映像の取得
   PImage img = ardrone.getVideoImage(false);
 
@@ -86,14 +61,14 @@ void draw() {
     if( kinect.isTrackingSkeleton(userId) ){
       drawKinectFlag = 0;
       con = pose.posePressed(userId);
-      msg = con.yaw + ":" + con.roll +  ":" + con.spin + "\n";
-      println(msg);
+      droneConMsg = con.yaw + ":" + con.roll +  ":" + con.spin + "\n";
+      println(droneConMsg);
       ardrone.move3D(con.yaw, con.roll, 0, con.spin);
     }else{
       drawKinectFlag = 1;
       con.yaw = 0;
       con.roll = 0;
-      msg = con.yaw + ":" + con.roll + ":" + con.spin + "\n";
+      droneConMsg = con.yaw + ":" + con.roll + ":" + con.spin + "\n";
       ardrone.landing();
     }
   }
@@ -110,7 +85,7 @@ void draw() {
     // scene.image(kinect.depthImage(), 0, 800-(480*0.8), 640*0.8,480*0.8);
     scene.textSize(30);
     scene.fill(250, 0, 0);
-    scene.text(msg,150, 500);
+    scene.text(droneConMsg,150, 500);
   }
   scene.translate(scene.width/2, scene.height/2, 100);
   scene.endDraw();

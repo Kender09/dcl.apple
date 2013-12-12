@@ -1,40 +1,30 @@
 import processing.net.*;
 import com.shigeodayo.ardrone.processing.*;
-
-import processing.video.*;
-import java.awt.image.*;
-import java.awt.*;
-import javax.imageio.*;
 import java.io.*;
-import java.net.DatagramPacket;  
 import java.net.*;
+import java.awt.image.*;
+import javax.imageio.*;
 
 ARDroneForP5 ardrone;
 
 InetSocketAddress remoteAddress;
 DatagramPacket sendPacket;
-DatagramPacket receivePacket;
-DatagramSocket receiveSocket;
- 
 //送信するバイト配列
 byte[] sendBytes;
 
-byte[] receivedBytes = new byte[300000];
-
-Client chatClient;
+Server droneConSever;
+Client droneConClient;
 float Val;
-String smsg;
+String droneConMsg;
+String testMsg;
+int startFlag = 0;
+String ipAddr;
+int conectFlag=0;
 
 void setup() {
   size(640, 480);
-  String ip_addr = "192.168.10.30";
 
-  remoteAddress = new InetSocketAddress(ip_addr,5100);
-
-
-  chatClient = new Client(this, ip_addr, 2001);
-
-
+  droneConSever = new Server(this,2001);
   ardrone = new ARDroneForP5("192.168.1.1");
   ardrone.connect();  
   //connect to the sensor info.
@@ -44,32 +34,49 @@ void setup() {
   //start the connections.
   ardrone.start();
 
-  textSize(50);  
-
+  textSize(30);  
 }
-
 
 void draw() {
   background(0);  
   PImage img = ardrone.getVideoImage(false);
   if (img == null){
+    startFlag = 0;
     return;
   }else{
+    startFlag = 1;
     image(img, 0, 0,640,480);
   }
-  if(chatClient.available()>0){
-    smsg=chatClient.readStringUntil('\n');
-    // println(smsg);
-    // 文字列からyaw,rollの数値を取得
-    int [] yaw_roll = int(split(smsg, ":"));
 
+  if(conectFlag == 0){
+    if(droneConSever.available() != null){
+      droneConClient = droneConSever.available();
+      testMsg=droneConClient.readStringUntil('\n');
+      ipAddr = droneConClient.ip();
+      remoteAddress = new InetSocketAddress(ipAddr,5100);
+      println(ipAddr + testMsg);
+      conectFlag = 1;
+    }else{
+      return;
+    }
+  }
+  fill(250, 0, 0);
+  text(ipAddr,100,100);
+
+  if(droneConSever.available() != null){
+    droneConClient = droneConSever.available();
+    droneConMsg=droneConClient.readStringUntil('\n');
+    // println(droneConMsg);
+    // 文字列からyaw,rollの数値を取得
+    int [] yaw_roll = int(split(droneConMsg, ":"));
     // ardrone操作の命令
     println(yaw_roll[0] + " : " + yaw_roll[1] + " : " + yaw_roll[2]);
-    text(yaw_roll[0] + " : " + yaw_roll[1] + " : " + yaw_roll[2], 400,100);
-    ardrone.move3D(yaw_roll[0], yaw_roll[1], 0, yaw_roll[2]);  //AR.Droneに命令を送る
+    fill(250, 250, 250);
+    text(yaw_roll[0] + " : " + yaw_roll[1] + " : " + yaw_roll[2], 100,300);
+    // ardrone.move3D(yaw_roll[0], yaw_roll[1], 0, yaw_roll[2]);  //AR.Droneに命令を送る
   }
 
-   //バッファーイメージに変換
+  //バッファーイメージに変換
   BufferedImage bfImage = PImage2BImage(img);
   //ストリームの準備
   ByteArrayOutputStream bos = new ByteArrayOutputStream();
@@ -82,6 +89,7 @@ void draw() {
     os.close();
   }
   catch(IOException e) {
+    text("error0",100,150);
   }
   sendBytes = bos.toByteArray();
   try {
@@ -89,10 +97,11 @@ void draw() {
     try{
       new DatagramSocket().send(sendPacket);
     } catch(IOException e){
+      text("error1",100,200);
     }
-    // println("bufferImageSended:"+sendBytes.length+" bytes #2");
   }
   catch(SocketException e) {
+    text("error2",100,300);
   }
 }
 

@@ -5,9 +5,9 @@ import processing.opengl.*;
 
 import processing.net.*; 
 import SimpleOpenNI.*; 
+import java.net.*; 
 import java.awt.*; 
 import javax.imageio.*; 
-import java.net.*; 
 
 import org.slf4j.helpers.*; 
 import com.xuggle.xuggler.video.*; 
@@ -65,7 +65,6 @@ public class client extends PApplet {
 
 
 
-// import java.*;
 
 SimpleOpenNI  kinect;
 PoseOperation pose;
@@ -76,7 +75,7 @@ DatagramPacket receivePacket;
 DatagramSocket receiveSocket;
 
 Client droneConClient;
-String ipAddr;
+String [] ipAddr;
 int inputIpFlag = 0;
 int conectFlag = 0;
 
@@ -132,11 +131,12 @@ public void draw() {
     text(inputIpAdd, width/2, height/2 + 100);
     return;
   }else if(inputIpFlag == 1){
-    ipAddr = inputIpAdd;
+    ipAddr = split(inputIpAdd, ":");
+    println(ipAddr[0]);
   }
 
   if(conectFlag == 0){
-    droneConClient =  new Client(this, ipAddr, 2001);
+    droneConClient =  new Client(this, ipAddr[0], 2001);
     conectFlag = 1;
     droneConClient.write("test\n");
     try {
@@ -294,7 +294,6 @@ public void set_shader(String eye)
 public void keyPressed() {
   inputIpAdd = inputIpAdd + key;
   if(key =='\n') {
-    inputIpAdd="";
     inputIpFlag = 1;
   }
   if (keyCode == CONTROL) {

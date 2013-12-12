@@ -240,7 +240,7 @@ public class ardroneMoveThread implements Runnable{
         println(yaw_roll[0] + " : " + yaw_roll[1] + " : " + yaw_roll[2]);
         fill(250, 250, 250);
         text(yaw_roll[0] + " : " + yaw_roll[1] + " : " + yaw_roll[2], 100,300);
-        ardrone.move3D(yaw_roll[0], yaw_roll[1], 0, yaw_roll[2]);  //AR.Drone\u306b\u547d\u4ee4\u3092\u9001\u308b
+        // ardrone.move3D(yaw_roll[0], yaw_roll[1], 0, yaw_roll[2]);  //AR.Drone\u306b\u547d\u4ee4\u3092\u9001\u308b
       }
 
     }
