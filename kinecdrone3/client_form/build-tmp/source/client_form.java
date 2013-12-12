@@ -131,9 +131,9 @@ public void setup() {
   // Load fragment shader for oculus rift barrel distortion
   barrel = loadShader("barrel_frag.glsl");  
 
-  kinect = new SimpleOpenNI(this);
-  kinect.enableDepth();
-  kinect.enableUser(SimpleOpenNI.SKEL_PROFILE_ALL);
+  // kinect = new SimpleOpenNI(this);
+  // kinect.enableDepth();
+  // kinect.enableUser(SimpleOpenNI.SKEL_PROFILE_ALL);
   
   pose = new PoseOperation(kinect);
   con = new ArDroneOrder();
@@ -216,25 +216,25 @@ public void draw() {
 
     //kinect \u30d7\u30ed\u30b0\u30e9\u30e0
     textSize(50);  
-    kinect.update();  
+    // kinect.update();  
 
-    IntVector userList = new IntVector();
-    kinect.getUsers(userList);
-    if (userList.size() > 0) {
-      int userId = userList.get(0);
-      if( kinect.isTrackingSkeleton(userId) ){
-        drawKinectFlag = 0;
-        con = pose.posePressed(userId);
-        msg = con.yaw + ":" + con.roll +  ":" + con.spin + "\n";
-        println(msg);
-        cl.write(msg);
-      }else{
-        drawKinectFlag = 1;
-        con.yaw = 0;
-        con.roll = 0;
-        msg = con.yaw + ":" + con.roll + ":" + con.spin + "\n";
-      }
-    }
+    // IntVector userList = new IntVector();
+    // kinect.getUsers(userList);
+    // if (userList.size() > 0) {
+    //   int userId = userList.get(0);
+    //   if( kinect.isTrackingSkeleton(userId) ){
+    //     drawKinectFlag = 0;
+    //     con = pose.posePressed(userId);
+    //     msg = con.yaw + ":" + con.roll +  ":" + con.spin + "\n";
+    //     println(msg);
+    //     cl.write(msg);
+    //   }else{
+    //     drawKinectFlag = 1;
+    //     con.yaw = 0;
+    //     con.roll = 0;
+    //     msg = con.yaw + ":" + con.roll + ":" + con.spin + "\n";
+    //   }
+    // }
 
     //oculusrift\u3088\u3046\u306b\u6620\u50cf\u3092\u5408\u6210
     scene.beginDraw();

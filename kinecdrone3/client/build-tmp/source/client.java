@@ -95,6 +95,7 @@ String ip_addr;
 int flag1 = 0, flag2 = 0;
 
 String msg;
+String input_ip = "";
 
 byte[] sendBytes;
 //\u53d7\u4fe1\u3059\u308b\u30d0\u30a4\u30c8\u914d\u5217\u3092\u683c\u7d0d\u3059\u308b\u7bb1
@@ -139,20 +140,25 @@ public void draw() {
   background(0);
 
   if(flag1 == 0){
-
+    textAlign(CENTER, CENTER);
+    textSize(60);
+    fill(100,100,200);
+    text("Welcom to KinecDrone",width/2, height/2 - 150);
+    textSize(20);
+    fill(255);
+    text("Input IP Address",width/2, height/2 + 10);
+    textSize(50);
+    text(input_ip, width/2, height/2 + 100);
     return;
   }else if(flag1 == 1){
-    ip_addr = "localhost";
+    ip_addr = input_ip;
   }
 
   if(flag2 == 0){
     cl =  new Client(this, ip_addr, 2001);
-
     flag2 = 1;
-      cl.write("test\n");
-      text(ip_addr,100,100);
+    cl.write("test\n");
     
-
     try {
     //\u53d7\u4fe1\u30dd\u30fc\u30c8
       receiveSocket = new DatagramSocket(5100);
@@ -308,12 +314,14 @@ public void set_shader(String eye)
 }
 
 public void keyPressed() {
-   if (key == 'e') {
-      flag1 = 1;
-    }
-    if(key == 'a'){
-      cl.write("test\n");
-    }
+  input_ip = input_ip + key;
+  if(key =='\n') {
+    input_ip="";
+    flag1 = 1;
+  }
+  if (keyCode == CONTROL) {
+    input_ip="";
+  }
 }
 public  int count;
 

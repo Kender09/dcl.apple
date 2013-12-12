@@ -42,14 +42,14 @@ void setup() {
 
   testImg = loadImage("buzz2.jpg");
 
-  // ardrone = new ARDroneForP5("192.168.1.1");
-  // ardrone.connect();  
-  // //connect to the sensor info.
-  // ardrone.connectNav();
-  // //connect to the image info.
-  // ardrone.connectVideo();
-  // //start the connections.
-  // ardrone.start();
+  ardrone = new ARDroneForP5("192.168.1.1");
+  ardrone.connect();  
+  //connect to the sensor info.
+  ardrone.connectNav();
+  //connect to the image info.
+  ardrone.connectVideo();
+  //start the connections.
+  ardrone.start();
 
   textSize(50);  
 }
@@ -57,8 +57,8 @@ void setup() {
 
 void draw() {
   background(0);  
-  // PImage img = ardrone.getVideoImage(false);
-  PImage img = testImg;
+  PImage img = ardrone.getVideoImage(false);
+  // PImage img = testImg;
   if (img == null){
     startFlag = 0;
     return;
@@ -72,9 +72,9 @@ void draw() {
     if(chatServer.available() != null){
       chatClient = chatServer.available();
       testS=chatClient.readStringUntil('\n');
-      // ardroneMoveThread movethread = new ardroneMoveThread();
-      // cthread = new Thread(movethread);
-      // cthread.start();
+      ardroneMoveThread movethread = new ardroneMoveThread();
+      cthread = new Thread(movethread);
+      cthread.start();
       ip_addr = chatClient.ip();
       remoteAddress = new InetSocketAddress(ip_addr,5100);
       println(ip_addr + testS);
@@ -188,7 +188,7 @@ public class ardroneMoveThread implements Runnable{
         int [] yaw_roll = int(split(smsg, ":"));
         // ardrone操作の命令
         println(yaw_roll[0] + " : " + yaw_roll[1] + " : " + yaw_roll[2]);
-        text(yaw_roll[0] + " : " + yaw_roll[1] + " : " + yaw_roll[2], 400,100);
+        text(yaw_roll[0] + " : " + yaw_roll[1] + " : " + yaw_roll[2], 100,300);
         ardrone.move3D(yaw_roll[0], yaw_roll[1], 0, yaw_roll[2]);  //AR.Droneに命令を送る
       }
 

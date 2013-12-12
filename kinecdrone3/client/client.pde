@@ -25,9 +25,10 @@ DatagramSocket receiveSocket;
 Server chatServer;
 Client cl;
 String ip_addr;
-int flag1 = 0, flag2 = 0;
+int conectFlag = 0;
 
 String msg;
+String input_ip = "";
 
 byte[] sendBytes;
 //受信するバイト配列を格納する箱
@@ -53,18 +54,15 @@ void setup() {
   // Load fragment shader for oculus rift barrel distortion
   barrel = loadShader("barrel_frag.glsl");  
 
-  // kinect = new SimpleOpenNI(this);
-  // kinect.enableDepth();
-  // kinect.enableUser(SimpleOpenNI.SKEL_PROFILE_ALL);
-  
+  kinect = new SimpleOpenNI(this);
+  kinect.enableDepth();
+  kinect.enableUser(SimpleOpenNI.SKEL_PROFILE_ALL);
   pose = new PoseOperation(kinect);
-
   con = new ArDroneOrder();
   con.yaw = 0;
   con.roll = 0;
 
   frameRate(10);
-  textSize(50);
 }
 
 
@@ -72,20 +70,25 @@ void draw() {
   background(0);
 
   if(flag1 == 0){
-
+    textAlign(CENTER, CENTER);
+    textSize(60);
+    fill(100,100,200);
+    text("Welcom to KinecDrone",width/2, height/2 - 150);
+    textSize(20);
+    fill(255);
+    text("Input IP Address",width/2, height/2 + 10);
+    textSize(50);
+    text(input_ip, width/2, height/2 + 100);
     return;
   }else if(flag1 == 1){
-    ip_addr = "localhost";
+    ip_addr = input_ip;
   }
 
-  if(flag2 == 0){
+  if(conectFlag == 0){
     cl =  new Client(this, ip_addr, 2001);
-
-    flag2 = 1;
-      cl.write("test\n");
-      text(ip_addr,100,100);
+    conectFlag = 1;
+    cl.write("test\n");
     
-
     try {
     //受信ポート
       receiveSocket = new DatagramSocket(5100);
@@ -102,40 +105,39 @@ void draw() {
     return;
   }
 
-  int flag5 = 1;
+  int receiveImgFlag = 1;
   //ARカメラ映像の取得
   try {
     receiveSocket.receive(receivePacket);
   }
   catch(IOException e) {
-    text("miss",100,100);
-    flag5 = 0;
+    println("miss");
+    receiveImgFlag = 0;
   } 
-  if(flag5 != 0){
+  if(receiveImgFlag != 0){
     Image awtImage = Toolkit.getDefaultToolkit().createImage(receivedBytes);
     receiveImage = loadImageMT(awtImage);
   }
 
   //kinect プログラム
-  // kinect.update();  
-
-  // IntVector userList = new IntVector();
-  // kinect.getUsers(userList);
-  // if (userList.size() > 0) {
-  //   int userId = userList.get(0);
-  //   if( kinect.isTrackingSkeleton(userId) ){
-  //     drawKinectFlag = 0;
-  //     con = pose.posePressed(userId);
-  //     msg = con.yaw + ":" + con.roll +  ":" + con.spin + "\n";
-  //     println(msg);
-  //     cl.write(msg);
-  //   }else{
-  //     drawKinectFlag = 1;
-  //     con.yaw = 0;
-  //     con.roll = 0;
-  //     msg = con.yaw + ":" + con.roll + ":" + con.spin + "\n";
-  //   }
-  // }
+  kinect.update();  
+  IntVector userList = new IntVector();
+  kinect.getUsers(userList);
+  if (userList.size() > 0) {
+    int userId = userList.get(0);
+    if( kinect.isTrackingSkeleton(userId) ){
+      drawKinectFlag = 0;
+      con = pose.posePressed(userId);
+      msg = con.yaw + ":" + con.roll +  ":" + con.spin + "\n";
+      println(msg);
+      cl.write(msg);
+    }else{
+      drawKinectFlag = 1;
+      con.yaw = 0;
+      con.roll = 0;
+      msg = con.yaw + ":" + con.roll + ":" + con.spin + "\n";
+    }
+  }
 
   //oculusriftように映像を合成
   scene.beginDraw();
@@ -143,7 +145,7 @@ void draw() {
   if(receiveImage != null)
     scene.image(receiveImage, 0, 0, 640, 800);
   if(drawKinectFlag == 1){
-    // scene.image(kinect.depthImage(), 320-((640*0.8)/2), 400-((480*0.8)/2), 640*0.8,480*0.8);
+    scene.image(kinect.depthImage(), 320-((640*0.8)/2), 400-((480*0.8)/2), 640*0.8,480*0.8);
   }else if(drawKinectFlag == 0){
     // scene.image(kinect.depthImage(), 0, 800-(480*0.8), 640*0.8,480*0.8);
     scene.textSize(30);
@@ -241,10 +243,12 @@ void set_shader(String eye)
 }
 
 void keyPressed() {
-   if (key == 'e') {
-      flag1 = 1;
-    }
-    if(key == 'a'){
-      cl.write("test\n");
-    }
+  input_ip = input_ip + key;
+  if(key =='\n') {
+    input_ip="";
+    flag1 = 1;
+  }
+  if (keyCode == CONTROL) {
+    input_ip="";
+  }
 }
